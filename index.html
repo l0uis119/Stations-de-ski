@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ski.been</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg:       #1a1410;
+  --surface:  #231e18;
+  --surface2: #2d2620;
+  --surface3: #38302a;
+  --border:   #3d3530;
+  --border2:  #4a403a;
+  --text:     #f0ebe3;
+  --text2:    #c4b8aa;
+  --muted:    #7a6e65;
+  --accent:   #e8854a;
+  --accent2:  #f0a86e;
+  --gold:     #d4a843;
+  --visited:  #e8854a;
+  --snow:     #f5efe8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;display:flex;flex-direction:column;height:100vh;}
+
+/* ─── NAV ─── */
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:50px;border-bottom:1px solid var(--border);background:var(--bg);z-index:1000;flex-shrink:0;position:relative;}
+.logo{font-family:'Playfair Display',serif;font-style:italic;font-size:21px;color:var(--snow);letter-spacing:-.3px;}
+.logo em{color:var(--accent);font-style:normal;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.stats-pill{font-size:11px;color:var(--muted);letter-spacing:.3px;}
+.stats-pill strong{color:var(--accent2);font-weight:500;}
+
+/* Icon button base */
+.icon-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;color:var(--muted);}
+.icon-btn:hover{border-color:var(--accent);color:var(--text);}
+.icon-btn.open{border-color:var(--accent);background:var(--surface2);color:var(--accent);}
+
+/* Burger lines */
+.burger-lines{display:flex;flex-direction:column;gap:4px;}
+.burger-lines span{display:block;width:14px;height:1.5px;background:currentColor;border-radius:2px;transition:all .25s;}
+.icon-btn.open .burger-lines span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.icon-btn.open .burger-lines span:nth-child(2){opacity:0;}
+.icon-btn.open .burger-lines span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+
+/* Dropdown shared */
+.dropdown{position:absolute;top:52px;right:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;z-index:3000;display:none;box-shadow:0 8px 36px rgba(0,0,0,.55);}
+.dropdown.open{display:block;animation:dropIn .15s ease;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
+/* Nav menu */
+#nav-menu{min-width:185px;}
+.menu-item{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .15s;user-select:none;}
+.menu-item:hover{background:var(--surface2);color:var(--text);}
+.menu-item.active{color:var(--accent);background:rgba(232,133,74,.1);}
+.menu-item .mi-icon{font-size:13px;width:18px;text-align:center;}
+.menu-sep{height:1px;background:var(--border);margin:4px 0;}
+
+/* ─── PAGES ─── */
+.page{display:none;flex:1;overflow:hidden;min-height:0;}
+.page.active{display:flex;}
+
+/* ─── MAP PAGE ─── */
+#page-map{position:relative;}
+#leaflet-map{width:100%;height:100%;}
+
+/* Tile filter – warm, slightly brighter */
+.leaflet-tile-pane{filter:brightness(0.72) saturate(0.55) sepia(0.25);}
+.leaflet-container{background:#100d0a;}
+
+/* Map controls overlay – top right (region gear only) */
+.map-controls{position:absolute;top:10px;right:10px;z-index:900;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+
+/* Layer switcher – top LEFT */
+.layer-controls{position:absolute;top:10px;left:10px;z-index:900;}
+
+/* Region gear button */
+.gear-btn{width:34px;height:34px;border:1px solid rgba(61,53,48,.9);border-radius:9px;background:rgba(26,20,16,.85);cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);color:var(--text2);transition:all .2s;}
+.gear-btn:hover{border-color:var(--accent);color:var(--accent);}
+.gear-btn.open{border-color:var(--accent);color:var(--accent);}
+.gear-btn svg{width:16px;height:16px;transition:transform .4s;}
+.gear-btn.open svg{transform:rotate(60deg);}
+
+/* Region panel dropdown */
+#region-dropdown{position:absolute;top:44px;right:0;background:rgba(26,20,16,.95);border:1px solid var(--border);border-radius:11px;padding:8px;backdrop-filter:blur(12px);min-width:170px;max-height:calc(100vh-120px);overflow-y:auto;display:none;}
+#region-dropdown.open{display:block;animation:dropIn .15s ease;}
+#region-dropdown::-webkit-scrollbar{width:3px;}
+#region-dropdown::-webkit-scrollbar-thumb{background:var(--border);}
+.rd-title{font-size:9px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);padding:3px 7px 7px;border-bottom:1px solid var(--border);margin-bottom:3px;}
+.rd-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;width:100%;}
+.rd-btn:hover{color:var(--text);background:var(--surface2);}
+.rd-btn.active{color:var(--accent);background:rgba(232,133,74,.12);border-color:rgba(232,133,74,.3);}
+.rd-count{font-size:10px;padding:1px 6px;border-radius:100px;background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.rd-btn.active .rd-count{color:var(--accent);border-color:rgba(232,133,74,.35);background:rgba(232,133,74,.12);}
+
+/* Map layer switcher */
+.layer-box{background:rgba(26,20,16,.9);border:1px solid var(--border);border-radius:10px;padding:7px;backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:3px;}
+.layer-btn{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;width:100%;}
+.layer-btn:hover{color:var(--text);background:var(--surface2);}
+.layer-btn.active{color:var(--accent);background:rgba(232,133,74,.1);border-color:rgba(232,133,74,.25);}
+.layer-btn .l-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+/* ─── MARKERS ─── */
+.ski-marker{border-radius:50%;cursor:pointer;box-sizing:border-box;transition:transform .15s;}
+.ski-marker:hover{transform:scale(1.5);}
+.ski-marker.unvisited{background:#3a2e28;border:1.5px solid #5a4a40;}
+.ski-marker.visited{background:var(--accent);border:1.5px solid var(--accent2);box-shadow:0 0 9px rgba(232,133,74,.6);}
+
+/* ─── STATION SHEET (side panel) ─── */
+.station-sheet{position:absolute;top:0;right:-420px;width:380px;height:100%;background:var(--surface);border-left:1px solid var(--border);z-index:950;overflow-y:auto;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;}
+.station-sheet.open{right:0;}
+.station-sheet::-webkit-scrollbar{width:4px;}
+.station-sheet::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+.sheet-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0;}
+.sheet-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.sheet-close:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,133,74,.1);}
+.sheet-name{font-family:'Playfair Display',serif;font-size:22px;color:var(--snow);line-height:1.2;}
+.sheet-massif{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.3px;}
+.sheet-alt{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:11px;color:var(--accent2);}
+
+.sheet-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;flex:1;}
+
+.sheet-visited-btn{width:100%;padding:11px;border-radius:9px;border:none;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;font-weight:400;}
+.sheet-visited-btn.add{background:rgba(232,133,74,.18);color:var(--accent);border:1px solid rgba(232,133,74,.3);}
+.sheet-visited-btn.add:hover{background:rgba(232,133,74,.28);}
+.sheet-visited-btn.remove{background:rgba(150,80,50,.12);color:#c47850;border:1px solid rgba(150,80,50,.25);}
+.sheet-visited-btn.remove:hover{background:rgba(150,80,50,.22);}
+
+.sheet-section{display:flex;flex-direction:column;gap:6px;}
+.sheet-section-title{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500;}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.info-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;}
+.info-card .ic-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.info-card .ic-val{font-size:13px;color:var(--text);font-weight:400;}
+
+.anecdote-box{background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:8px;padding:11px 13px;font-size:12px;color:var(--text2);line-height:1.6;font-style:italic;}
+
+/* Séjours */
+.stays-list{display:flex;flex-direction:column;gap:5px;}
+.stay-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:12px;gap:8px;}
+.stay-dates{color:var(--text2);}
+.stay-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;transition:color .2s;line-height:1;}
+.stay-del:hover{color:#f87171;}
+
+.add-stay-form{display:flex;gap:6px;flex-wrap:wrap;}
+.date-input{flex:1;min-width:110px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 9px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;transition:border-color .2s;}
+.date-input:focus{border-color:var(--accent);}
+.date-input::-webkit-calendar-picker-indicator{filter:invert(0.5);}
+.stay-add-btn{padding:7px 12px;border-radius:7px;border:none;background:rgba(232,133,74,.18);color:var(--accent);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.stay-add-btn:hover{background:rgba(232,133,74,.28);}
+
+/* ─── POPUP (minimal, opens sheet on click) ─── */
+.leaflet-popup-content-wrapper{background:var(--surface) !important;border:1px solid var(--border) !important;border-radius:9px !important;box-shadow:0 4px 24px rgba(0,0,0,.55) !important;padding:0 !important;}
+.leaflet-popup-tip-container{display:none !important;}
+.leaflet-popup-content{margin:0 !important;}
+.mini-popup{padding:10px 13px;cursor:pointer;min-width:140px;}
+.mini-popup-name{font-size:13px;font-weight:500;color:var(--text);}
+.mini-popup-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.mini-popup-hint{font-size:10px;color:var(--accent);margin-top:6px;opacity:.8;}
+
+/* ─── ADD PAGE ─── */
+#page-add{flex-direction:column;align-items:center;overflow-y:auto;padding:30px 20px;background:var(--bg);}
+.add-inner{width:100%;max-width:600px;}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--snow);margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px 11px 40px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;font-weight:300;outline:none;transition:border-color .2s;}
+.search-input::placeholder{color:var(--muted);}
+.search-input:focus{border-color:var(--accent);background:var(--surface2);}
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.filter-chip{padding:4px 10px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;transition:all .15s;}
+.filter-chip:hover{border-color:var(--accent);color:var(--text);}
+.filter-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(232,133,74,.09);}
+.res-info{font-size:11px;color:var(--muted);margin-bottom:8px;}
+.station-list{display:flex;flex-direction:column;gap:3px;}
+.s-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;border-radius:9px;border:1px solid transparent;background:var(--surface);cursor:pointer;transition:all .12s;}
+.s-item:hover{border-color:var(--border2);background:var(--surface2);}
+.s-item.visited{border-color:rgba(232,133,74,.2);background:rgba(232,133,74,.04);}
+.s-item.visited:hover{border-color:rgba(232,133,74,.35);}
+.s-name{font-size:13px;font-weight:400;color:var(--text);}
+.s-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.s-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.s-item.visited .s-check{background:var(--visited);border-color:var(--visited);}
+.s-check svg{opacity:0;transition:opacity .2s;width:9px;color:#fff;}
+.s-item.visited .s-check svg{opacity:1;}
+
+/* ─── LIST PAGE ─── */
+#page-list{flex-direction:column;align-items:center;overflow-y:auto;padding:30px 20px;background:var(--bg);}
+.list-inner{width:100%;max-width:600px;}
+.group-label{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:18px 0 7px;}
+.group-label:first-child{margin-top:0;}
+.d-item{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-radius:9px;background:var(--surface);border:1px solid rgba(232,133,74,.12);margin-bottom:3px;cursor:pointer;transition:border-color .15s;}
+.d-item:hover{border-color:rgba(232,133,74,.3);}
+.d-name{font-size:13px;font-weight:400;}
+.d-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.d-stays{font-size:10px;color:var(--accent2);margin-top:2px;}
+.del-btn{width:24px;height:24px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.del-btn:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35);color:#f87171;}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-icon{font-size:42px;margin-bottom:12px;}
+.empty-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:6px;}
+.empty-sub{font-size:13px;}
+
+/* Toast */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:8px 18px;font-size:12px;color:var(--text);opacity:0;transition:all .28s;z-index:9999;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
+
+/* Leaflet zoom */
+.leaflet-control-zoom a{background:var(--surface) !important;color:var(--text2) !important;border-color:var(--border) !important;}
+.leaflet-control-zoom a:hover{background:var(--surface2) !important;color:var(--accent) !important;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ski<em>.</em>been</div>
+  <div class="nav-right">
+    <div class="stats-pill" id="stats-pill"><strong>0</strong> station</div>
+    <div class="icon-btn" id="burger" onclick="toggleMenu()">
+      <div class="burger-lines"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="dropdown" id="nav-menu">
+    <div class="menu-item active" id="mi-map" onclick="showPage('map')"><span class="mi-icon">🗺️</span> Carte</div>
+    <div class="menu-item" id="mi-add" onclick="showPage('add')"><span class="mi-icon">＋</span> Ajouter une station</div>
+    <div class="menu-item" id="mi-list" onclick="showPage('list')"><span class="mi-icon">⛷️</span> Mes stations</div>
+  </div>
+</nav>
+
+<!-- MAP -->
+<div id="page-map" class="page active">
+  <div id="leaflet-map"></div>
+
+  <!-- Top-LEFT: Layer switcher -->
+  <div class="layer-controls">
+    <div class="layer-box">
+      <button class="layer-btn active" id="lb-topo" onclick="setLayer('topo')">
+        <div class="l-dot" style="background:#7a9a6a"></div> Topo
+      </button>
+      <button class="layer-btn" id="lb-satellite" onclick="setLayer('satellite')">
+        <div class="l-dot" style="background:#4a6a8a"></div> Satellite
+      </button>
+      <button class="layer-btn" id="lb-street" onclick="setLayer('street')">
+        <div class="l-dot" style="background:#8a7a5a"></div> Rue
+      </button>
+      <button class="layer-btn" id="lb-winter" onclick="setLayer('winter')">
+        <div class="l-dot" style="background:#9ab0c8"></div> Neige
+      </button>
+    </div>
+  </div>
+
+  <!-- Top-RIGHT: Region gear -->
+  <div class="map-controls">
+    <div style="position:relative">
+      <button class="gear-btn" id="gear-btn" onclick="toggleRegionDropdown()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </button>
+      <div id="region-dropdown">
+        <div class="rd-title">Zone</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Station sheet panel -->
+  <div class="station-sheet" id="station-sheet">
+    <div class="sheet-header">
+      <div>
+        <div class="sheet-name" id="sh-name">—</div>
+        <div class="sheet-massif" id="sh-massif">—</div>
+        <div class="sheet-alt" id="sh-alt">—</div>
+      </div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 3L5 8l5 5"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <button class="sheet-visited-btn add" id="sh-toggle-btn" onclick="sheetToggle()">✓ Marquer comme skié</button>
+
+      <div class="sheet-section">
+        <div class="sheet-section-title">Infos station</div>
+        <div class="info-grid" id="sh-info-grid"></div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-section-title">Anecdote</div>
+        <div class="anecdote-box" id="sh-anecdote">—</div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-section-title">Mes séjours</div>
+        <div class="stays-list" id="sh-stays"></div>
+        <div class="add-stay-form" style="margin-top:6px">
+          <input type="date" class="date-input" id="stay-from" placeholder="Arrivée">
+          <input type="date" class="date-input" id="stay-to" placeholder="Départ">
+          <button class="stay-add-btn" onclick="addStay()">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD -->
+<div id="page-add" class="page">
+  <div class="add-inner">
+    <div class="page-title">Ajouter une station</div>
+    <div class="page-sub">Clique pour marquer les stations où tu es allé</div>
+    <div class="search-wrap">
+      <svg class="search-ico" width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13.5 13.5L18 18"/></svg>
+      <input class="search-input" id="search-input" placeholder="Ex: Méribel, la joue, chamonix, ischgl, st laye…" oninput="renderList()" autocomplete="off">
+    </div>
+    <div class="filter-row" id="filter-row"></div>
+    <div class="res-info" id="res-info"></div>
+    <div class="station-list" id="station-list"></div>
+  </div>
+</div>
+
+<!-- LIST -->
+<div id="page-list" class="page">
+  <div class="list-inner">
+    <div class="page-title">Mes stations</div>
+    <div class="page-sub" id="list-sub">—</div>
+    <div id="done-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// STATION DATABASE — fiches complètes pour chaque station
+// ══════════════════════════════════════════════════════════
+const STATIONS = [
+// ── ALPES DU NORD ──────────────────────────────────────
+{id:1,  name:"Les Arcs",      region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3226, lat:45.55, lon:6.82,
+ open:"Nov", created:1968, domain:"200 km de pistes", anecdote:"Inventée par Roger Godino en 1968 avec l'idée radicale de construire la station directement sur les pistes. Première station piétonne des Alpes — pas une seule route à traverser pour skier."},
+{id:2,  name:"Méribel",       region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:2952, lat:45.40, lon:6.56,
+ open:"Nov", created:1938, domain:"600 km (3 Vallées)", anecdote:"Fondée en 1938 par le colonel Peter Lindsay qui fuyait l'Europe de la guerre. Il imposa une architecture 'savoyarde' unifiée — tous les chalets sont en bois foncé. Au centre des 3 Vallées, c'est le plus grand domaine skiable du monde."},
+{id:3,  name:"Courchevel",    region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:2738, lat:45.41, lon:6.63,
+ open:"Déc", created:1946, domain:"600 km (3 Vallées)", anecdote:"Première station construite par l'État français après-guerre en 1946. Son altiport avec une piste en pente à 18,5% est l'un des plus spectaculaires au monde — les avions y atterrissent comme des fléchettes."},
+{id:4,  name:"Val Thorens",   region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3200, lat:45.29, lon:6.58,
+ open:"Nov", created:1972, domain:"600 km (3 Vallées)", anecdote:"Station la plus haute d'Europe à 2300m d'altitude. En décembre, pendant que les Alpes du bas manquent de neige, Val Thorens est déjà entièrement ouvert. Ouvre souvent début novembre, certaines années même fin octobre."},
+{id:5,  name:"Les Menuires",  region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:2850, lat:45.32, lon:6.54,
+ open:"Déc", created:1964, domain:"600 km (3 Vallées)", anecdote:"Construite dans un style 'brutaliste' des années 60 qui lui vaut aujourd'hui un statut patrimonial de l'architecture. Ses barres en béton ont été reconnues pour leur intérêt historique unique dans les Alpes."},
+{id:6,  name:"La Plagne",     region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3250, lat:45.50, lon:6.67,
+ open:"Déc", created:1961, domain:"425 km de pistes", anecdote:"La station la plus fréquentée de France avec près d'un million de skieurs par saison. Elle possède une vraie piste de bobsleigh homologuée olympique depuis les JO d'Albertville 1992 — la seule en France."},
+{id:7,  name:"Tignes",        region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3456, lat:45.47, lon:6.91,
+ open:"Oct", created:1952, domain:"300 km (Espace Killy)", anecdote:"L'ancien village de Tignes a été englouti sous le lac de barrage en 1952. Les habitants, expropriés de force, ont résisté pendant des années. Sous la glace du lac, on peut parfois encore voir les ruines du clocher."},
+{id:8,  name:"Val d'Isère",   region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3456, lat:45.44, lon:6.97,
+ open:"Nov", created:1932, domain:"300 km (Espace Killy)", anecdote:"L'Espace Killy porte le nom de Jean-Claude Killy, enfant du village, triple champion olympique en 1968 à Grenoble. La Face de Bellevarde, noire légendaire, a accueilli la descente olympique — une des plus exigeantes jamais créées."},
+{id:9,  name:"Chamonix",      region:"Alpes du Nord", massif:"Mont-Blanc", alt:3842, lat:45.92, lon:6.87,
+ open:"Déc", created:1924, domain:"170 km de pistes", anecdote:"La station de ski la plus ancienne du monde — elle a accueilli les tout premiers Jeux Olympiques d'Hiver en 1924. La Vallée Blanche, 20 km de ski hors-piste du sommet de l'Aiguille du Midi, est le freeride le plus célèbre de la planète."},
+{id:10, name:"Les Houches",   region:"Alpes du Nord", massif:"Mont-Blanc", alt:1900, lat:45.88, lon:6.80,
+ open:"Déc", created:1937, domain:"55 km de pistes", anecdote:"Connue pour abriter la piste Verte, descendue par Bode Miller et compagnie lors de la Coupe du Monde — une 'verte' de 2000m de dénivelé qui n'a rien d'une promenade. Vue imprenable sur le Mont Blanc depuis le sommet."},
+{id:11, name:"Megève",        region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:2350, lat:45.85, lon:6.62,
+ open:"Déc", created:1921, domain:"325 km de pistes", anecdote:"Créée par la famille Rothschild en 1921 pour concurrencer Saint-Moritz jugée 'trop peuplée d'Allemands'. Devenue le symbole du ski chic français avec ses vieilles rues pavées, ses hôtels de luxe et son ambiance village."},
+{id:12, name:"Saint-Gervais", region:"Alpes du Nord", massif:"Mont-Blanc", alt:2353, lat:45.88, lon:6.70,
+ open:"Déc", created:1892, domain:"445 km (Évasion MB)", anecdote:"Le Tramway du Mont-Blanc, construit en 1892, est le seul train de montagne français à crémaillère encore en service. Il monte à 2372m et offre une vue saisissante sur le glacier de Bionnassay."},
+{id:13, name:"Morzine",       region:"Alpes du Nord", massif:"Portes du Soleil", alt:2466, lat:46.17, lon:6.71,
+ open:"Déc", created:1934, domain:"650 km (Portes du Soleil)", anecdote:"Le domaine des Portes du Soleil est le plus grand domaine skiable franco-suisse au monde : 12 stations reliées entre la France et la Suisse. Morzine est le village le plus traditionnel, avec ses chalets en ardoise grise typiques du Chablais."},
+{id:14, name:"Avoriaz",       region:"Alpes du Nord", massif:"Portes du Soleil", alt:2466, lat:46.19, lon:6.76,
+ open:"Nov", created:1966, domain:"650 km (Portes du Soleil)", anecdote:"Construite perchée à 1800m, accessible seulement par télécabine ou cheval. Pas une seule voiture dans la station. L'architecture futuriste des années 70, toute en bois sombre et toit en écailles, est devenue un emblème du ski design."},
+{id:15, name:"Les Gets",      region:"Alpes du Nord", massif:"Portes du Soleil", alt:1866, lat:46.16, lon:6.67,
+ open:"Déc", created:1934, domain:"650 km (Portes du Soleil)", anecdote:"Village savoyard authentique avec son marché artisanal. Abrite le Musée de la Musique Mécanique, unique au monde, avec plus de 600 instruments automatiques du 18ème siècle. L'ambiance est plus familiale que ses voisines."},
+{id:16, name:"Châtel",        region:"Alpes du Nord", massif:"Portes du Soleil", alt:2200, lat:46.26, lon:6.84,
+ open:"Déc", created:1955, domain:"650 km (Portes du Soleil)", anecdote:"Le dernier village avant la frontière suisse. Le Super-Châtel donne directement sur Morgins côté helvète — on peut skier d'un pays à l'autre dans la même descente. Le fromage Abondance AOP vient de cette vallée."},
+{id:17, name:"La Clusaz",     region:"Alpes du Nord", massif:"Aravis", alt:2600, lat:45.90, lon:6.42,
+ open:"Déc", created:1907, domain:"130 km de pistes", anecdote:"Première station à avoir installé un téléski en France, en 1936. Connue pour ses courses de ski de fond de haut niveau et pour le fromage Reblochon qu'on produit dans les chalets alentours depuis le Moyen Âge."},
+{id:18, name:"Le Grand-Bornand", region:"Alpes du Nord", massif:"Aravis", alt:2100, lat:45.94, lon:6.42,
+ open:"Déc", created:1948, domain:"90 km de pistes", anecdote:"Capitale mondiale du ski de fond : le Grand-Bornand accueille chaque année la Grande Odyssée, l'une des courses de chiens de traîneau les plus prestigieuses d'Europe. Village authentique avec son église baroque du 18ème."},
+{id:19, name:"Flaine",        region:"Alpes du Nord", massif:"Grand Massif", alt:2480, lat:46.00, lon:6.69,
+ open:"Déc", created:1968, domain:"265 km (Grand Massif)", anecdote:"Station construite par l'architecte Marcel Breuer, élève du Bauhaus. Sculptures de Picasso, Vasarely et Dubuffet ornent la place centrale. Un musée d'art moderne en plein air à 1600m d'altitude — concept totalement unique dans les Alpes."},
+{id:20, name:"Samoëns",       region:"Alpes du Nord", massif:"Grand Massif", alt:2480, lat:46.08, lon:6.72,
+ open:"Déc", created:1962, domain:"265 km (Grand Massif)", anecdote:"Classé parmi les Plus Beaux Villages de France, Samoëns possède un jardin alpin unique créé en 1906 par Marie-Louise Cognacq, épouse du fondateur de La Samaritaine. Plus de 5000 espèces de plantes alpines y poussent."},
+{id:21, name:"Les Contamines", region:"Alpes du Nord", massif:"Mont-Blanc", alt:2487, lat:45.82, lon:6.72,
+ open:"Déc", created:1964, domain:"120 km de pistes", anecdote:"La station la plus enneigée du massif du Mont-Blanc grâce à son exposition nord. Dans un parc naturel, sans immeubles ni laideurs — juste des chalets, des forêts et 2487m de neige. Très prisée des familles qui fuient les grandes stations."},
+{id:22, name:"Pralognan-la-Vanoise", region:"Alpes du Nord", massif:"Vanoise", alt:2360, lat:45.38, lon:6.72,
+ open:"Déc", created:1897, domain:"25 km de pistes", anecdote:"Berceau de l'alpinisme savoyard depuis 1897. La Vanoise est le premier Parc National créé en France, en 1963. Ici, on ne vient pas pour les domaines géants mais pour la nature préservée : loups, lynx, bouquetins et chamois à portée de bâton."},
+{id:23, name:"Bonneval-sur-Arc", region:"Alpes du Nord", massif:"Haute-Maurienne", alt:3000, lat:45.36, lon:7.05,
+ open:"Déc", created:1952, domain:"25 km de pistes", anecdote:"Village le plus haut de Savoie et l'un des plus beaux de France — entièrement construit en pierre d'arkose locale. L'électricité et la route ne sont arrivées qu'en 1963. Les habitants n'utilisent que des luges pour transporter le bois."},
+{id:24, name:"Val Cenis",     region:"Alpes du Nord", massif:"Haute-Maurienne", alt:2800, lat:45.27, lon:6.79,
+ open:"Déc", created:1940, domain:"125 km de pistes", anecdote:"Créé sur le Col du Mont-Cenis, l'un des passages les plus anciens des Alpes — Hannibal et ses éléphants y seraient passés en -218. Le lac artificiel couvre l'emplacement du vieux village, noyé en 1968 comme Tignes."},
+{id:25, name:"Aussois",       region:"Alpes du Nord", massif:"Haute-Maurienne", alt:2750, lat:45.23, lon:6.74,
+ open:"Déc", created:1960, domain:"55 km de pistes", anecdote:"Au-dessus du village, les forts Esseillon sont cinq ouvrages militaires sarde du 19ème siècle, parfaitement conservés, dominant la vallée. Le domaine est modeste mais l'ensoleillement y est exceptionnel — plus de 300 jours par an."},
+{id:26, name:"Saint-François-Longchamp", region:"Alpes du Nord", massif:"Lauzière", alt:2650, lat:45.43, lon:6.37,
+ open:"Déc", created:1965, domain:"160 km de pistes", anecdote:"Une station familiale à taille humaine qui a résisté aux sirènes du gigantisme. Belle vue sur la Lauzière et le Grand Arc. L'architecture y est restée cohérente — pas de barres en béton, juste des chalets en bois bien intégrés."},
+{id:27, name:"Valmorel",      region:"Alpes du Nord", massif:"Lauzière", alt:2550, lat:45.48, lon:6.46,
+ open:"Déc", created:1976, domain:"165 km de pistes", anecdote:"Construit ex nihilo en 1976 avec l'ambition de créer un 'village de montagne'. Ruelles piétonnes, fontaines, arcades — une tentative réussie d'humaniser l'urbanisme des stations de ski. Moins connu mais très apprécié des familles."},
+{id:28, name:"Les Karellis",  region:"Alpes du Nord", massif:"Maurienne", alt:2520, lat:45.24, lon:6.47,
+ open:"Déc", created:1970, domain:"60 km de pistes", anecdote:"Station coopérative, la seule des Alpes gérée par des comités d'entreprise et des associations. Ambiance très familiale et mixte socio-culturellement — une alternative assumée aux stations de luxe. Pistes excellentes, souvent enneigées."},
+{id:29, name:"Peisey-Vallandry", region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3226, lat:45.52, lon:6.77,
+ open:"Nov", created:1967, domain:"425 km (Paradiski)", anecdote:"Reliée à La Plagne et Les Arcs via le téléphérique Vanoise Express, le plus grand téléphérique bi-câble du monde. Il survole le vide à 380m de hauteur et transporte 200 personnes en une seule cabine — sensation garantie."},
+{id:30, name:"Champagny-en-Vanoise", region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:2800, lat:45.43, lon:6.73,
+ open:"Déc", created:1969, domain:"425 km (Paradiski)", anecdote:"Village traditionnel avec son église baroque du 17ème. Porte d'entrée méconnue du domaine Paradiski mais beaucoup plus authentique que La Plagne. Les locaux y skient depuis des générations, bien avant les touristes."},
+{id:31, name:"La Rosière",    region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:1850, lat:45.64, lon:6.83,
+ open:"Déc", created:1960, domain:"150 km (Espace San Bernardo)", anecdote:"Le col du Petit-Saint-Bernard, à 2188m, relie La Rosière à La Thuile en Italie. Un couloir historique emprunté par les Romains et plus tard par Napoléon. On peut skier de France en Italie en une seule descente."},
+{id:32, name:"Sainte-Foy-Tarentaise", region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:2620, lat:45.58, lon:6.88,
+ open:"Déc", created:1988, domain:"44 km de pistes", anecdote:"Véritable secret des skieurs expérimentés. Petit domaine mais neige poudreuse exceptionnelle grâce à son exposition nord. Connue pour ses runs de poudreuse et son ambiance décontractée — le refuge des skieurs qui fuient les foules."},
+{id:33, name:"Valloire",      region:"Alpes du Nord", massif:"Galibier-Thabor", alt:2600, lat:45.16, lon:6.44,
+ open:"Déc", created:1932, domain:"150 km de pistes", anecdote:"La capitale mondiale des sculptures sur neige — chaque janvier, des artistes du monde entier transforment le village en galerie géante. La route du Galibier, fermée en hiver, coupe le village du reste du monde — une île de neige."},
+{id:34, name:"Valmeinier",    region:"Alpes du Nord", massif:"Galibier-Thabor", alt:2600, lat:45.19, lon:6.58,
+ open:"Déc", created:1969, domain:"150 km (avec Valloire)", anecdote:"Relié à Valloire via le domaine du Galibier-Thabor. L'architecture de la station haute (1800m) contraste avec le vieux village baroque (1500m) aux maisons à colombages. Moins fréquenté que ses voisines savoyardes."},
+{id:35, name:"Les Saisies",   region:"Alpes du Nord", massif:"Beaufortain", alt:1950, lat:45.75, lon:6.53,
+ open:"Déc", created:1954, domain:"160 km de pistes", anecdote:"Site des épreuves olympiques de biathlon et de ski de fond d'Albertville 1992. Frank Piccard y remporta la descente — un héros local. Le domaine nordique est l'un des plus vastes des Alpes, avec plus de 80 km de pistes de fond."},
+{id:36, name:"Arêches-Beaufort", region:"Alpes du Nord", massif:"Beaufortain", alt:2100, lat:45.68, lon:6.62,
+ open:"Déc", created:1952, domain:"70 km de pistes", anecdote:"Dans le pays du Beaufort AOP — le 'prince des gruyères'. Les alpages autour de la station nourrissent les vaches Tarentaise dont le lait produit ce fromage d'exception. Ambiance authentique, très loin de l'agitation des grandes stations."},
+{id:37, name:"Crest-Voland",  region:"Alpes du Nord", massif:"Aravis", alt:1891, lat:45.79, lon:6.52,
+ open:"Déc", created:1950, domain:"135 km (Espace Diamant)", anecdote:"Fait partie de l'Espace Diamant avec Notre-Dame-de-Bellecombe et les Gets. Vue panoramique sur le Mont-Blanc exceptionnelle. Village calme et chaleureux, parfait pour les familles qui recherchent l'authenticité savoyarde."},
+{id:38, name:"Notre-Dame-de-Bellecombe", region:"Alpes du Nord", massif:"Aravis", alt:2070, lat:45.80, lon:6.54,
+ open:"Déc", created:1940, domain:"135 km (Espace Diamant)", anecdote:"Chapelle baroque du 17ème siècle au cœur du village, classée monument historique. La vue sur le Mont-Blanc depuis les pistes est considérée comme l'une des plus belles des Alpes françaises. Très familiale, peu médiatisée."},
+{id:39, name:"Flumet",        region:"Alpes du Nord", massif:"Aravis", alt:1800, lat:45.81, lon:6.51,
+ open:"Déc", created:1950, domain:"135 km (Espace Diamant)", anecdote:"Petit village à la croisée des vallées de l'Arly et du Dorinet. La Tour de Flumet, donjon médiéval du 12ème siècle, domine encore le bourg. Les artisans fromagers y perpétuent la fabrication du Tome des Bauges depuis des générations."},
+{id:40, name:"Praz-sur-Arly", region:"Alpes du Nord", massif:"Aravis", alt:1600, lat:45.83, lon:6.57,
+ open:"Déc", created:1935, domain:"60 km de pistes", anecdote:"Relié à Megève mais avec une ambiance bien plus tranquille et des prix beaucoup plus raisonnables. Les Aravis ici offrent une vue directe sur le Mont-Blanc avec moins de monde. Réputé pour son ensoleillement et ses bonnes conditions de neige tardive."},
+{id:41, name:"La Giettaz",    region:"Alpes du Nord", massif:"Aravis", alt:1900, lat:45.79, lon:6.48,
+ open:"Déc", created:1955, domain:"135 km (Espace Diamant)", anecdote:"Dernier village savoyard avant la Haute-Savoie. Fromages artisanaux fabriqués dans les fermes encore en activité visible depuis les pistes. Les chamois descendent parfois sur les pistes en fin de journée — spectacle garanti."},
+{id:42, name:"Manigod",       region:"Alpes du Nord", massif:"Aravis", alt:2000, lat:45.88, lon:6.38,
+ open:"Déc", created:1968, domain:"25 km de pistes", anecdote:"Hameau dispersé sur les hauteurs de la vallée de Manigod. Fermes d'alpage encore en activité, fromage artisanal vendu à la ferme. Station modeste mais ambiance authentique incomparable — les vaches reviennent sur les pistes dès fin mars."},
+{id:43, name:"Combloux",      region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:1974, lat:45.87, lon:6.63,
+ open:"Déc", created:1933, domain:"445 km (Évasion Mont-Blanc)", anecdote:"Surnommé le 'Balcon du Mont-Blanc' — le panorama sur le massif est ici exceptionnel, à 180 degrés. Village aux chalets fleuris en été, reconnu parmi les plus beaux de Haute-Savoie. Très calme, une alternative parfaite à Megève."},
+{id:44, name:"Morillon",      region:"Alpes du Nord", massif:"Grand Massif", alt:2480, lat:46.04, lon:6.71,
+ open:"Déc", created:1965, domain:"265 km (Grand Massif)", anecdote:"Porte d'entrée la moins fréquentée du Grand Massif. Village traditionnel avec ses greniers à sel et son lavoir du 18ème siècle. La remontée depuis le village (600m) à Morillon 1100 offre un beau panorama sur la vallée du Giffre."},
+{id:45, name:"Les Carroz",    region:"Alpes du Nord", massif:"Grand Massif", alt:2480, lat:46.02, lon:6.64,
+ open:"Déc", created:1933, domain:"265 km (Grand Massif)", anecdote:"Fondée en 1933 par des forestiers qui avaient observé les premières descentes en ski. Vue splendide sur la vallée du Giffre et le massif du Haut-Giffre. Station familiale avec une excellente école de ski."},
+{id:46, name:"Sixt-Fer-à-Cheval", region:"Alpes du Nord", massif:"Grand Massif", alt:2480, lat:46.07, lon:6.78,
+ open:"Déc", created:1968, domain:"265 km (Grand Massif)", anecdote:"Au fond d'un cirque naturel exceptionnel, le Fer-à-Cheval, ensemble de cascades et de falaises vertigineuses classé Grand Site de France. La Combe de Gelly, couloir de ski extrême, est un mythe du freeride franco-suisse."},
+{id:47, name:"Praz-de-Lys",   region:"Alpes du Nord", massif:"Faucigny", alt:1660, lat:46.10, lon:6.62,
+ open:"Déc", created:1948, domain:"55 km de pistes", anecdote:"Relié à Taninges, c'est un plateau à 1500m entouré de forêts de sapins — paysage nordique surprenant dans les Alpes françaises. Très bon enneigement naturel grâce à son orientation nord. Fréquenté principalement par les Genevois."},
+{id:48, name:"Thollon-les-Mémises", region:"Alpes du Nord", massif:"Chablais", alt:2000, lat:46.38, lon:6.67,
+ open:"Déc", created:1955, domain:"25 km de pistes", anecdote:"Perché à 1000m face au Lac Léman et aux Alpes suisses — la vue est à couper le souffle. Petite station familiale qui offre un panorama unique sur le lac et le Grand-Combin en Suisse. Très fréquenté par les familles de la rive sud du lac."},
+{id:49, name:"Bernex",        region:"Alpes du Nord", massif:"Chablais", alt:1981, lat:46.35, lon:6.69,
+ open:"Déc", created:1960, domain:"20 km de pistes", anecdote:"Petit village chablaisien au pied des Dents du Midi. Les chalets en ardoise grise sont typiques de l'architecture du Chablais, différente du reste de la Savoie. Fromage d'Abondance AOP produit dans les fermes visibles depuis les pistes."},
+{id:50, name:"Abondance",     region:"Alpes du Nord", massif:"Portes du Soleil", alt:1800, lat:46.28, lon:6.73,
+ open:"Déc", created:1960, domain:"650 km (Portes du Soleil)", anecdote:"L'abbaye d'Abondance, fondée au 11ème siècle, abrite des fresques médiévales exceptionnelles classées monument historique. Les moines cisterciens ont créé ici la race bovine Abondance et son fromage éponyme, l'un des premiers AOC alpins."},
+{id:51, name:"La Chapelle-d'Abondance", region:"Alpes du Nord", massif:"Portes du Soleil", alt:2000, lat:46.27, lon:6.79,
+ open:"Déc", created:1962, domain:"650 km (Portes du Soleil)", anecdote:"Village authentique au cœur du Chablais avec son chapelle baroque du 17ème siècle. Fromages artisanaux de saison vendus à la ferme. Porte d'entrée discrète sur le gigantesque domaine des Portes du Soleil."},
+{id:52, name:"Orelle",        region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3230, lat:45.28, lon:6.51,
+ open:"Déc", created:2000, domain:"600 km (3 Vallées)", anecdote:"Entrée secrète des 3 Vallées depuis la Maurienne. Une télécabine de 7 km monte directement de 900m à 2400m pour rejoindre Val Thorens. Quasi inconnue des touristes, elle permet d'accéder aux 600 km sans passer par les stations bondées."},
+{id:53, name:"Saint-Pierre-de-Chartreuse", region:"Alpes du Nord", massif:"Chartreuse", alt:1800, lat:45.34, lon:5.81,
+ open:"Déc", created:1932, domain:"30 km de pistes", anecdote:"Dans le massif de la Chartreuse, berceau de l'ordre monastique éponyme. La Grande Chartreuse, couvent fondé en 1084, est visible depuis les pistes. Les moines produisent toujours la Chartreuse dans la distillerie de Voiron — recette secrète depuis 1605."},
+{id:54, name:"Col de Porte",  region:"Alpes du Nord", massif:"Chartreuse", alt:1326, lat:45.25, lon:5.77,
+ open:"Déc", created:1935, domain:"20 km de pistes", anecdote:"La station la plus proche de Grenoble (30 minutes) et la plus accessible du massif de la Chartreuse. Des générations de Grenoblois ont appris à skier ici. Vue directe sur le Vercors et le Belledonne depuis les sommets."},
+{id:55, name:"Plagne Montchavin", region:"Alpes du Nord", massif:"Savoie Mont-Blanc", alt:3250, lat:45.51, lon:6.69,
+ open:"Nov", created:1972, domain:"425 km (Paradiski)", anecdote:"Ancien hameau d'alpage transformé en station en gardant son architecture savoyarde. C'est l'entrée la plus pittoresque du domaine Paradiski — les vieux chalets en pierre contrastent avec les remontées ultra-modernes qui montent vers La Plagne."},
+// ── ALPES DU SUD ───────────────────────────────────────
+{id:60, name:"Alpe d'Huez",   region:"Alpes du Sud", massif:"Oisans", alt:3330, lat:45.09, lon:6.07,
+ open:"Nov", created:1936, domain:"250 km de pistes", anecdote:"La mythique arrivée du Tour de France — les 21 lacets de la route ont leur propre légende depuis 1952. Avec 300 jours de soleil par an, c'est l'île au soleil des Alpes. La piste Sarenne, 16 km de descente noire non-stop, est la plus longue d'Europe."},
+{id:61, name:"Les Deux Alpes", region:"Alpes du Sud", massif:"Oisans", alt:3568, lat:45.02, lon:6.12,
+ open:"Nov", created:1946, domain:"220 km de pistes", anecdote:"Le plus grand glacier skiable d'Europe avec 1400m de dénivelé permanent. En été, c'est la seule station française à offrir du ski alpin sur glacier entre juillet et septembre. Le Jardin de Glace, grotte naturelle taillée dans la glace, est un trésor souterrain."},
+{id:62, name:"Serre Chevalier", region:"Alpes du Sud", massif:"Briançonnais", alt:2800, lat:44.92, lon:6.50,
+ open:"Déc", created:1941, domain:"250 km de pistes", anecdote:"Relie 13 villages du Briançonnais — une station tentaculaire sans centre. Briançon, la ville la plus haute d'Europe à 1326m, est classée par l'UNESCO pour ses fortifications de Vauban. La neige y est légère et sèche grâce au microclimat continental."},
+{id:63, name:"Vars",          region:"Alpes du Sud", massif:"Forêt Blanche", alt:2750, lat:44.56, lon:6.70,
+ open:"Déc", created:1927, domain:"180 km (Forêt Blanche)", anecdote:"Le Speed Skiing World Championship s'y déroule chaque année — des skieurs atteignent 250 km/h sur les pentes de la Grande Planche. Record du monde de vitesse en ski établi ici en 2016 par Simon Billy : 254,958 km/h."},
+{id:64, name:"Risoul",        region:"Alpes du Sud", massif:"Forêt Blanche", alt:2600, lat:44.62, lon:6.62,
+ open:"Déc", created:1971, domain:"180 km (Forêt Blanche)", anecdote:"Construit en forêt de mélèzes à 1850m, Risoul 1850 a l'avantage d'être entièrement intégré dans les arbres — une protection naturelle contre le vent et une neige exceptionnellement sèche grâce à l'altitude et l'exposition."},
+{id:65, name:"Puy-Saint-Vincent", region:"Alpes du Sud", massif:"Écrins", alt:2700, lat:44.84, lon:6.48,
+ open:"Déc", created:1964, domain:"75 km de pistes", anecdote:"Au pied du Parc National des Écrins — les bouquetins et chamois observent les skieurs depuis les rochers. Vue imprenable sur la Barre des Écrins (4102m). La neige y est exceptionnelle grâce à l'altitude et l'exposition au nord."},
+{id:66, name:"Orcières-Merlette", region:"Alpes du Sud", massif:"Champsaur", alt:2726, lat:44.70, lon:6.33,
+ open:"Nov", created:1962, domain:"100 km de pistes", anecdote:"La station la plus ensoleillée de France avec 300 jours de soleil par an. Construite sur un plateau à 1850m, elle bénéficie d'un microclimat exceptionnel. L'enneigement y est fiable jusqu'en mai, quand les autres stations ferment déjà."},
+{id:67, name:"Chamrousse",    region:"Alpes du Sud", massif:"Belledonne", alt:2253, lat:45.12, lon:5.88,
+ open:"Déc", created:1968, domain:"90 km de pistes", anecdote:"Site olympique des JO de Grenoble 1968 — Jean-Claude Killy y remporta deux de ses trois médailles d'or. Le musée des Jeux de 1968 en plein air permet de retrouver l'ambiance de ces Jeux historiques sur les sites originaux."},
+{id:68, name:"Les Sept Laux", region:"Alpes du Sud", massif:"Belledonne", alt:2400, lat:45.28, lon:6.05,
+ open:"Déc", created:1965, domain:"120 km de pistes", anecdote:"Un des rares domaines encore sauvage en Belledonne. Les sept lacs glaciaires qui donnent leur nom à la station sont visibles en été depuis les crêtes. Neige poudreuse réputée, freeride de qualité, et une ambiance familiale loin des foules des grandes stations."},
+{id:69, name:"Villard-de-Lans", region:"Alpes du Sud", massif:"Vercors", alt:2050, lat:45.07, lon:5.55,
+ open:"Déc", created:1933, domain:"125 km de pistes", anecdote:"Pendant la Seconde Guerre Mondiale, Villard-de-Lans fut un refuge pour les enfants juifs cachés par les habitants. La résistance du Vercors, plateau naturellement fortifié, fut l'un des hauts lieux de la Résistance française — les Maquisards du Vercors."},
+{id:70, name:"Corrençon-en-Vercors", region:"Alpes du Sud", massif:"Vercors", alt:2050, lat:45.02, lon:5.52,
+ open:"Déc", created:1936, domain:"125 km (avec Villard)", anecdote:"Village-bout-du-monde au fond du Vercors, face à la Grande Moucherolle. Le Vercors est le plus grand Parc Naturel Régional des Alpes — forêts de hêtres centenaires et plateaux karstiques encore sauvages. Ski de fond exceptionnel."},
+{id:71, name:"Autrans",       region:"Alpes du Sud", massif:"Vercors", alt:1783, lat:45.18, lon:5.54,
+ open:"Déc", created:1940, domain:"50 km de pistes nordiques", anecdote:"Capitale du ski de fond français. Le marathon des Foulées du Vercors, 42 km sur les plateaux karstiques, attire chaque hiver des milliers de fondeurs. Autrans et Méaudre forment le cœur nordique du Vercors, terrain de préparation de l'équipe de France."},
+{id:72, name:"Gresse-en-Vercors", region:"Alpes du Sud", massif:"Vercors", alt:1700, lat:44.92, lon:5.53,
+ open:"Déc", created:1935, domain:"22 km de pistes", anecdote:"Tout petit domaine au pied du Grand Veymont, point culminant du Vercors à 2341m. Village médiéval avec ses maisons en pisé — architecture rare en montagne. La vue sur les falaises vertigineuses du bord du plateau est saisissante."},
+{id:73, name:"Montgenèvre",   region:"Alpes du Sud", massif:"Briançonnais", alt:2702, lat:44.93, lon:6.72,
+ open:"Nov", created:1909, domain:"400 km (Voie Lactée)", anecdote:"Plus ancienne station de ski de France, fondée en 1909. Le Col de Montgenèvre, à 1860m, fut une voie de passage romaine stratégique entre Gaule et Italie. La Voie Lactée relie 5 stations franco-italiennes dont Sestrière."},
+{id:74, name:"La Grave",      region:"Alpes du Sud", massif:"Écrins", alt:3568, lat:45.04, lon:6.30,
+ open:"Déc", created:1976, domain:"2200m de dénivelé hors-piste", anecdote:"La station la plus radicale des Alpes : un seul téléphérique, pas de pistes tracées, que du hors-piste. Face à la Meije (3982m), accessible uniquement avec un guide. Mecca mondiale du ski extrême — rien pour les débutants."},
+{id:75, name:"La Joue du Loup", region:"Alpes du Sud", massif:"Dévoluy", alt:2525, lat:44.66, lon:5.96,
+ open:"Déc", created:1970, domain:"100 km (Dévoluy)", anecdote:"Dans le massif secret du Dévoluy — calcaire karstique et paysages lunaires uniques dans les Alpes françaises. La station est nichée à 1450m dans un cirque naturel de calcaire blanc. Enneigement excellent grâce aux vents du nord-ouest."},
+{id:76, name:"Superdévoluy",  region:"Alpes du Sud", massif:"Dévoluy", alt:2500, lat:44.67, lon:5.91,
+ open:"Déc", created:1968, domain:"100 km (Dévoluy)", anecdote:"Construction radicale des années 60 avec ses tours de béton brut posées à 1500m dans le désert calcaire du Dévoluy. Ambiance insolite et austère mais enneigement fiable et domaine préservé. Parmi les meilleures conditions de poudreuse des Alpes du Sud."},
+{id:77, name:"Chaillol",      region:"Alpes du Sud", massif:"Champsaur", alt:2382, lat:44.73, lon:6.22,
+ open:"Déc", created:1956, domain:"45 km de pistes", anecdote:"Nichée dans une forêt de mélèzes à 1600m, Chaillol est l'archétype de la station familiale sans chichis. Vue sur le Vieux Chaillol (3163m). Le Champsaur est encore un territoire préservé du tourisme de masse — fromage Bleu du Vercors à déguster obligatoirement."},
+{id:78, name:"Ancelle",       region:"Alpes du Sud", massif:"Champsaur", alt:1750, lat:44.63, lon:6.19,
+ open:"Déc", created:1950, domain:"30 km de pistes", anecdote:"Perchée sur un plateau à 1340m dominant la vallée du Champsaur. Village provençal-alpin aux maisons de pierre blonde — on se croirait en Provence avec de la neige. La vue sur les Écrins est absolument remarquable."},
+{id:79, name:"Saint-Léger-les-Mélèzes", region:"Alpes du Sud", massif:"Champsaur", alt:1750, lat:44.69, lon:6.13,
+ open:"Déc", created:1958, domain:"30 km de pistes", anecdote:"Dans une forêt de mélèzes centenaires, ce village micro-station propose un ski tranquille à 1260m. Les mélèzes en hiver — squelettes argentés sous la neige — créent une ambiance quasi magique que les grandes stations n'ont pas."},
+{id:80, name:"Les Orres",     region:"Alpes du Sud", massif:"Embrunais", alt:2720, lat:44.50, lon:6.57,
+ open:"Nov", created:1970, domain:"100 km de pistes", anecdote:"Station la plus méridionale des hautes Alpes, à deux pas du lac de Serre-Ponçon. Vue spectaculaire sur le plus grand lac artificiel d'Europe et les Écrins. L'enneigement est garanti grâce à l'altitude et l'exposition nord — un rapport qualité-prix excellent."},
+{id:81, name:"Pra Loup",      region:"Alpes du Sud", massif:"Haute-Ubaye", alt:2600, lat:44.37, lon:6.60,
+ open:"Déc", created:1961, domain:"180 km (Espace Lumière)", anecdote:"Fief de la famille de Gaulle — la maison familiale du Général est toujours debout dans le village. Relié à la Foux d'Allos pour former l'Espace Lumière. Vue imprenable sur les sommets de l'Ubaye et accès aux faces nord poudreuses."},
+{id:82, name:"La Foux d'Allos", region:"Alpes du Sud", massif:"Haute-Ubaye", alt:2600, lat:44.27, lon:6.57,
+ open:"Déc", created:1964, domain:"180 km (Espace Lumière)", anecdote:"La plus haute station des Alpes-de-Haute-Provence. Le lac d'Allos, à 2230m, est le plus grand lac naturel d'Europe à cette altitude — magnifique randonnée d'été. En hiver, le domaine offre des poudreuses régulières et des faces nord préservées."},
+{id:83, name:"Auron",         region:"Alpes du Sud", massif:"Mercantour", alt:2400, lat:44.19, lon:6.91,
+ open:"Déc", created:1930, domain:"135 km de pistes", anecdote:"À 90 km de Nice, Auron est la station de ski des Niçois et des Monégasques depuis les années 30. On peut skier face à la Méditerranée par temps clair. Dans le Parc du Mercantour, les loups sont revenus naturellement dans les années 90."},
+{id:84, name:"Isola 2000",    region:"Alpes du Sud", massif:"Mercantour", alt:2610, lat:44.19, lon:7.16,
+ open:"Nov", created:1971, domain:"120 km de pistes", anecdote:"Station-village construite d'un bloc à 2000m dans la vallée de la Tinée. Accès direct depuis Nice en 1h30. L'une des rares stations françaises à posséder son propre glacier — le Vallon du Loup. Frontière italienne à 10 minutes à pied."},
+{id:85, name:"Valberg",       region:"Alpes du Sud", massif:"Mercantour", alt:2100, lat:44.09, lon:6.93,
+ open:"Déc", created:1936, domain:"90 km de pistes", anecdote:"La station la plus provençale des Alpes — les lavandes fleurissent à 15 km plus bas. Architecture de village avec clocher baroque et ruelles médiévales. Les fleurs de lavande ornent les décors des chalets en été — un parfum d'Alpes-Maritimes inoubliable."},
+{id:86, name:"Montclar",      region:"Alpes du Sud", massif:"Haute-Ubaye", alt:1870, lat:44.33, lon:6.37,
+ open:"Déc", created:1968, domain:"40 km de pistes", anecdote:"Petit domaine familial dans la montagne de Lure. Clientèle fidèle de Marseillais et Aixois qui y viennent depuis des générations. La forêt de mélèzes et cèdres de l'Atlas (introduits au 19ème siècle) donne un caractère unique et dépaysant."},
+{id:87, name:"Alpe du Grand Serre", region:"Alpes du Sud", massif:"Matheysine", alt:1700, lat:44.99, lon:5.86,
+ open:"Déc", created:1960, domain:"40 km de pistes", anecdote:"Sur le plateau de la Matheysine, face au Taillefer. La Matheysine est une région secrète coincée entre Belledonne et Vercors, accessible par la route napoléonienne. Petit domaine familial avec une ambiance locale très authentique."},
+{id:88, name:"Méaudre",       region:"Alpes du Sud", massif:"Vercors", alt:1450, lat:45.13, lon:5.52,
+ open:"Déc", created:1934, domain:"50 km (avec Autrans)", anecdote:"Village fondé par des colons agricoles au 12ème siècle sur les plateaux du Vercors. Fromage Saint-Marcellin produit dans la région depuis 1400. Ski de fond exceptionnel sur le plateau karst. Ambiance nordique garantie dans les grands froids."},
+// ── ALPES DU SUD — SUITE ───────────────────────────────
+{id:89, name:"St Laye en Champsaur", region:"Alpes du Sud", massif:"Champsaur", alt:1700, lat:44.71, lon:6.17,
+ open:"Déc", created:1952, domain:"15 km de pistes", anecdote:"Minuscule station perchée sur le flanc du Champsaur à 1450m — quasi inconnue au-delà des habitants du Gap. Les pistes, tracées à la main dans les années 50 par les agriculteurs locaux, offrent une vue imprenable sur les Écrins et le Devoluy. Fromage de chèvre de la ferme d'à côté."},
+{id:90, name:"Réallon",       region:"Alpes du Sud", massif:"Champsaur", alt:1850, lat:44.52, lon:6.22,
+ open:"Déc", created:1954, domain:"25 km de pistes", anecdote:"Village de montagne avec ses maisons en pierres sèches et ses ruelles médiévales. Vue extraordinaire sur le lac de Serre-Ponçon. Domaine modeste mais neige fiable grâce à l'orientation nord. Les paysans du coin pratiquaient le ski-alpinisme dès 1900."},
+{id:91, name:"Lus-la-Croix-Haute", region:"Alpes du Sud", massif:"Dévoluy", alt:1600, lat:44.66, lon:5.71,
+ open:"Déc", created:1960, domain:"30 km de pistes", anecdote:"Station confidentielle au carrefour du Dévoluy et du Trièves. Les rochers calcaires blancs du Dévoluy créent un paysage lunaire absolument unique dans les Alpes. Ski calme, nature préservée — le contraire du gigantisme savoyard."},
+{id:92, name:"Orcières 1850", region:"Alpes du Sud", massif:"Champsaur", alt:2726, lat:44.70, lon:6.33,
+ open:"Nov", created:1962, domain:"100 km de pistes", anecdote:"Station sport d'altitude par excellence. Le mont Seuse (2641m) offre une vue à 360° sur les Écrins, le Vercors, la Chartreuse et même le Ventoux par temps clair. Station climatique reconnue : l'air y est parmi les plus purs d'Europe."},
+// ── PYRÉNÉES ───────────────────────────────────────────
+{id:100,name:"Cauterets",     region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2500, lat:42.89, lon:-0.12,
+ open:"Déc", created:1897, domain:"90 km de pistes", anecdote:"Victor Hugo y est venu, Chateaubriand y est venu, Baudelaire aussi — Cauterets fut la station thermale la plus chic des Pyrénées au 19ème. L'escalier en bois du Grand Casino et les villas Belle Époque témoignent de cette époque fastueuse."},
+{id:101,name:"Saint-Lary-Soulan", region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2515, lat:42.82, lon:0.32,
+ open:"Déc", created:1940, domain:"100 km de pistes", anecdote:"Village thermale gascon au pied des pistes. La station thermale de Saint-Lary date du 18ème siècle — les sources chaudes sulfureuses sont un contrepoint délicieux aux journées de ski. La Neste d'Aure, rivière qui traverse le village, est l'une des plus belles de France."},
+{id:102,name:"La Mongie",     region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2500, lat:42.91, lon:0.14,
+ open:"Déc", created:1935, domain:"100 km (Grand Tourmalet)", anecdote:"Sur les flancs du col du Tourmalet, le plus haut col routier des Pyrénées à 2115m. La Mongie et Barèges forment le Grand Tourmalet, le plus grand domaine skiable des Pyrénées françaises. Le Tour de France y passe chaque été dans les souffrances."},
+{id:103,name:"Barèges",       region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2350, lat:42.90, lon:-0.06,
+ open:"Déc", created:1892, domain:"100 km (Grand Tourmalet)", anecdote:"Première station de ski des Pyrénées, créée en 1892 à l'initiative du commandant Doyen. Le plus vieux ski-club de France a été fondé ici. La neige de Barèges, sèche et légère, a une réputation qui dépasse les Pyrénées."},
+{id:104,name:"Luz-Ardiden",   region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2485, lat:42.88, lon:-0.06,
+ open:"Déc", created:1972, domain:"80 km de pistes", anecdote:"Célèbre pour l'arrivée d'étape mythique du Tour de France où Indurain attaquait comme un diable. Vue sur le cirque de Gavarnie et la frontière espagnole. Station familiale avec les meilleures tarifs des Hautes-Pyrénées."},
+{id:105,name:"Piau Engaly",   region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2575, lat:42.79, lon:0.17,
+ open:"Déc", created:1970, domain:"65 km de pistes", anecdote:"Station la plus haute des Pyrénées françaises, perchée à 1850m dans la vallée de Rioumajou. Accès par une route spectaculaire qui monte en lacets serrés dans la forêt. L'isard — le chamois pyrénéen — est souvent aperçu sur les pistes."},
+{id:106,name:"Gavarnie-Gèdre",region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2400, lat:42.73, lon:-0.02,
+ open:"Déc", created:1965, domain:"30 km de pistes", anecdote:"Au pied du Cirque de Gavarnie, UNESCO, la plus grande muraille naturelle d'Europe. La Grande Cascade de Gavarnie, 422m de chute libre, est visible depuis les pistes. Victor Hugo écrivit que Gavarnie était 'la chose la plus grandiose que l'œil de l'homme ait pu voir'."},
+{id:107,name:"Font Romeu",    region:"Pyrénées", massif:"Pyrénées-Orientales", alt:2213, lat:42.51, lon:2.05,
+ open:"Déc", created:1910, domain:"45 km de pistes", anecdote:"Centre d'entraînement en altitude de l'équipe de France olympique depuis les années 60. La Cerdagne, plateau à 1200m d'altitude, bénéficie de 3000 heures de soleil par an — record de France. Le train jaune, petit train de montagne, traverse ce plateau depuis 1910."},
+{id:108,name:"Les Angles",    region:"Pyrénées", massif:"Pyrénées-Orientales", alt:2400, lat:42.54, lon:2.01,
+ open:"Déc", created:1964, domain:"55 km de pistes", anecdote:"Dominant le lac de Matemale, réservoir d'eau de la Cerdagne. Le parc animalier des Angles, à côté des pistes, abrite des loups, ours, bisons et lynx en liberté semi-contrôlée — une visite unique après le ski. Vue sur le Canigou catalan."},
+{id:109,name:"Formiguères",   region:"Pyrénées", massif:"Pyrénées-Orientales", alt:2457, lat:42.61, lon:2.09,
+ open:"Déc", created:1968, domain:"28 km de pistes", anecdote:"Village médiéval catalan aux maisons de granit rose typiques du Capcir. L'église romane du 12ème siècle et son clocher de pierre rose sont classés. En Capcir, les forêts de pins sylvestres alternent avec les tourbières gelées — paysage quasi-sibérien."},
+{id:110,name:"Ax 3 Domaines", region:"Pyrénées", massif:"Ariège", alt:2400, lat:42.72, lon:1.83,
+ open:"Déc", created:1959, domain:"80 km de pistes", anecdote:"Ax-les-Thermes, au pied des pistes, a été cité thermale depuis le Moyen Âge — la place du Bassin des Ladres était un bain public médiéval. Porte d'entrée sur le Pays Cathare et les châteaux cathares de l'Ariège — une histoire médiévale passionnante."},
+{id:111,name:"Guzet-Neige",   region:"Pyrénées", massif:"Ariège", alt:2100, lat:42.75, lon:1.14,
+ open:"Déc", created:1964, domain:"40 km de pistes", anecdote:"Station la plus secrète de l'Ariège, dans la vallée du Haut-Salat. Ambiance familiale et authentique loin des foules. L'Ariège est la porte des Pyrénées cathares — grottes de Niaux avec des peintures rupestres magdaléniennes à 30 minutes."},
+{id:112,name:"Gourette",      region:"Pyrénées", massif:"Pyrénées-Atlantiques", alt:1400, lat:42.96, lon:-0.34,
+ open:"Déc", created:1924, domain:"30 km de pistes", anecdote:"Première station de ski des Pyrénées occidentales, créée en 1924 grâce aux pionniers du Club Alpin Basque. Le col d'Aubisque voisin est l'un des géants du Tour de France. Les neiges du Gave de Pau sont restées dans la mémoire collective béarnaise."},
+{id:113,name:"La Pierre-Saint-Martin", region:"Pyrénées", massif:"Pyrénées-Atlantiques", alt:2000, lat:43.08, lon:-0.89,
+ open:"Déc", created:1954, domain:"35 km de pistes", anecdote:"Le gouffre de la Pierre-Saint-Martin est l'une des cavités naturelles les plus profondes du monde — 1410m de vertical souterrain. Lors du traité de 1375, les bergers basques et navarrais se retrouvaient ici chaque juillet depuis 600 ans pour célébrer la 'Junte'."},
+{id:114,name:"Iraty",         region:"Pyrénées", massif:"Pays Basque", alt:1500, lat:43.06, lon:-1.06,
+ open:"Déc", created:1968, domain:"25 km nordique + alpin", anecdote:"Au cœur de la plus grande forêt de hêtres d'Europe occidentale — 17 000 hectares de forêt primaire. Les palombes (pigeons ramiers) migrent par millions en automne au-dessus d'Iraty. Un des rares endroits où cohabite une faune presque intacte."},
+{id:115,name:"Superbagnères", region:"Pyrénées", massif:"Haute-Garonne", alt:2260, lat:42.73, lon:0.67,
+ open:"Déc", created:1922, domain:"30 km de pistes", anecdote:"Le Grand Hôtel de Superbagnères, construit en 1922 en style Belle Époque, trône à 1800m comme un paquebot échoué sur la montagne. Ascenseur panoramique, ballroom, piscine intérieure — le luxe d'antan face aux Pyrénées. Histoire unique."},
+{id:116,name:"Peyragudes",    region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2400, lat:42.80, lon:0.48,
+ open:"Déc", created:1979, domain:"60 km de pistes", anecdote:"Née de la fusion de Peyresourde et Les Agudes en 1979. Les skateurs y sont venus créer des kickers géants dans les années 90 — Peyragudes est devenu un spot snowboard majeur des Pyrénées. Ambiance jeune et dynamique contrastant avec les stations tradition."},
+{id:117,name:"Val Louron",    region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2100, lat:42.90, lon:0.47,
+ open:"Déc", created:1965, domain:"40 km de pistes", anecdote:"Face au lac de Génos-Loudenvielle, Val Louron est la station des gens du coin — les Bigourdens y viennent le week-end depuis des générations. Accès au col de Peyresourde, l'un des plus beaux belvédères des Hautes-Pyrénées."},
+{id:118,name:"Hautacam",      region:"Pyrénées", massif:"Hautes-Pyrénées", alt:1797, lat:43.00, lon:-0.07,
+ open:"Déc", created:1975, domain:"25 km de pistes", anecdote:"L'arrivée d'Hautacam est mythique dans le Tour de France — Riis y attaqua en 1996, Ulrich en 1997. La station bénéficie d'une vue spectaculaire sur Lourdes et le cirque de Gavarnie. Domaine modeste mais authenticité totale."},
+{id:119,name:"Artouste",      region:"Pyrénées", massif:"Pyrénées-Atlantiques", alt:2100, lat:42.98, lon:-0.49,
+ open:"Déc", created:1952, domain:"25 km de pistes", anecdote:"Le petit train d'Artouste, construit en 1924 pour les travailleurs du barrage, monte à 2000m en longeant le lac d'Artouste sur 10 km — l'une des expériences les plus spectaculaires des Pyrénées. En hiver, la montée se fait en télécabine."},
+{id:120,name:"Cambre d'Aze",  region:"Pyrénées", massif:"Pyrénées-Orientales", alt:2408, lat:42.52, lon:2.12,
+ open:"Déc", created:1969, domain:"20 km de pistes", anecdote:"Petit domaine catalan face au soleil de Cerdagne. Les pistes descendent sur un plateau qui ressemble à l'Islande en hiver — vaste, ouvert, avec des paysages de landes gelées. Vue sur le Canigou, montagne sacrée des Catalans, à moins de 40 km."},
+{id:121,name:"Nistos",        region:"Pyrénées", massif:"Hautes-Pyrénées", alt:1470, lat:43.05, lon:0.48,
+ open:"Déc", created:1958, domain:"15 km de pistes", anecdote:"Ultra-confidentiel : la plupart des guides pyrénéens ne mentionnent pas Nistos. Village de 100 âmes avec quelques remontées et des pistes forestières. Ambiance de ski de grand-père totalement anachronique et absolument charmante."},
+{id:122,name:"Mijanes-Donezan", region:"Pyrénées", massif:"Ariège", alt:2080, lat:42.69, lon:2.01,
+ open:"Déc", created:1970, domain:"15 km de pistes", anecdote:"Au fond du Pays de Donezan, l'une des vallées les plus isolées des Pyrénées ariégeoises. Village de 50 habitants, accessible par une route qui ferme parfois en hiver. Ski authentique, sans complexe, avec vue sur les soulanes espagnoles."},
+// ── SUISSE ─────────────────────────────────────────────
+{id:140,name:"Verbier",       region:"Suisse", massif:"Valais", alt:4314, lat:46.10, lon:7.22,
+ open:"Nov", created:1925, domain:"330 km (4 Vallées)", anecdote:"Le freeride capital du monde. Les Faces du Mont-Fort (3330m), couloirs couloir Stairway to Heaven, ont établi la réputation de Verbier comme temple du ski extrême. Freeride World Tour s'y arrête chaque année — les meilleures descentes du monde."},
+{id:141,name:"Zermatt",       region:"Suisse", massif:"Valais", alt:4478, lat:46.02, lon:7.75,
+ open:"Oct", created:1864, domain:"360 km de pistes", anecdote:"Sous le Cervin (4478m), la plus célèbre montagne du monde. Village sans voitures depuis 1929 — seuls les taxis électriques silencieux circulent. Le glacier du Plateau Rosa permet de skier 365 jours par an. Ouvre en octobre pour les équipes nationales."},
+{id:142,name:"Crans-Montana", region:"Suisse", massif:"Valais", alt:3000, lat:46.31, lon:7.48,
+ open:"Déc", created:1893, domain:"160 km de pistes", anecdote:"La Descente de Crans-Montana, course de Coupe du Monde, est la plus ancienne de l'histoire avec ses virages serrés et ses compressions violentes. Vue panoramique sur 300 km d'Alpes depuis Cervin jusqu'au Weisshorn — spectaculaire."},
+{id:143,name:"Saas-Fee",      region:"Suisse", massif:"Valais", alt:3500, lat:46.11, lon:7.93,
+ open:"Sep", created:1951, domain:"145 km de pistes", anecdote:"Surnommée la 'Perle des Alpes' — entourée par 13 sommets de 4000m dont le Dom (4545m). Village sans voitures, uniquement des chemins de bois. Ski sur glacier ouvert de septembre à mai. Les glaciers en recul révèlent des artefacts préhistoriques."},
+{id:144,name:"Davos",         region:"Suisse", massif:"Grisons", alt:2844, lat:46.80, lon:9.83,
+ open:"Déc", created:1888, domain:"300 km (Davos-Klosters)", anecdote:"La ville la plus haute d'Europe à 1560m. Thomas Mann y a écrit La Montagne Magique (1924) dans un sanatorium de tuberculeux — une époque où on venait en montagne pour guérir. Le Forum Économique Mondial (Davos) s'y tient chaque janvier."},
+{id:145,name:"St. Moritz",    region:"Suisse", massif:"Engadine", alt:3303, lat:46.49, lon:9.84,
+ open:"Nov", created:1864, domain:"350 km de pistes", anecdote:"Inventrice du tourisme hivernal en 1864 lorsque les premiers touristes anglais acceptèrent de venir en hiver. A accueilli les JO d'hiver deux fois (1928 et 1948). La piste de Cresta Run, luge sur glace artificielle, est la plus ancienne et la plus dangereuse du monde depuis 1884."},
+{id:146,name:"Wengen",        region:"Suisse", massif:"Oberland Bernois", alt:2971, lat:46.61, lon:7.92,
+ open:"Déc", created:1893, domain:"213 km (Jungfrau Region)", anecdote:"Village perché à 1274m, accessible uniquement par train. La descente de Lauberhorn, créée en 1930, est la plus longue et la plus rapide de la Coupe du Monde — 4,5 km à plus de 160 km/h. Les falaises de l'Eiger en toile de fond constituent le décor le plus spectaculaire du circuit."},
+{id:147,name:"Grindelwald",   region:"Suisse", massif:"Oberland Bernois", alt:2971, lat:46.62, lon:8.04,
+ open:"Déc", created:1888, domain:"213 km (Jungfrau Region)", anecdote:"Au pied de la face nord de l'Eiger (3970m), la 'Murder Wall', qui a tué 64 alpinistes. La Jungfrau (4158m), 'la Jeune Femme', est le sommet accessible le plus haut d'Europe par train cogné. Village de carte postale avec ses chalets fleuris."},
+{id:148,name:"Gstaad",        region:"Suisse", massif:"Saanenland", alt:3000, lat:46.47, lon:7.28,
+ open:"Déc", created:1912, domain:"220 km de pistes", anecdote:"Le village suisse le plus mondain — Roger Moore, Grace de Monaco, Liz Taylor y ont eu leurs chalets. Le Gstaad Palace, palace 1912, est l'hôtel de montagne le plus cher du monde. Mais les pistes sont vraiment bonnes — on ne vient pas que pour être vu."},
+{id:149,name:"Laax",          region:"Suisse", massif:"Grisons", alt:3018, lat:46.81, lon:9.25,
+ open:"Nov", created:1965, domain:"224 km de pistes", anecdote:"Le meilleur halfpipe du monde selon les riders — le Laax Open y accueille les meilleurs snowboarders du monde chaque janvier. L'architecture de la station, avec ses design hotels épurés, est devenue référence mondiale du mountain lifestyle moderne."},
+{id:150,name:"Champéry",      region:"Suisse", massif:"Portes du Soleil", alt:2466, lat:46.18, lon:6.87,
+ open:"Déc", created:1915, domain:"650 km (Portes du Soleil)", anecdote:"Village suisse-romand traditionnel avec ses chalets en bois sombre typiques du Chablais. La piste des Chavannes descend en France — un plongeon international depuis les Préalpes suisses jusque dans la vallée française. Ambiance radicalement différente de Morzine côté français."},
+{id:151,name:"Morgins",       region:"Suisse", massif:"Portes du Soleil", alt:2466, lat:46.24, lon:6.91,
+ open:"Déc", created:1950, domain:"650 km (Portes du Soleil)", anecdote:"Village valaisanais paisible, un des plus traditionnels des Portes du Soleil. La route de la Croix, qui monte depuis Monthey, est l'une des plus belles routes de montagne de Suisse romande. Accès direct à Châtel côté français sans voiture."},
+// ── AUTRICHE ───────────────────────────────────────────
+{id:160,name:"Kitzbühel",     region:"Autriche", massif:"Tyrol", alt:2000, lat:47.45, lon:12.38,
+ open:"Oct", created:1893, domain:"170 km de pistes", anecdote:"La Hahnenkamm Race, créée en 1931, est la course de ski la plus célèbre et la plus dangereuse du monde — 8 km à 130 km/h sur la Streif. La ville médiévale rose et ocre avec ses remparts du 14ème siècle est unique dans les Alpes autrichiennes."},
+{id:161,name:"St. Anton",     region:"Autriche", massif:"Arlberg", alt:2811, lat:47.13, lon:10.27,
+ open:"Déc", created:1907, domain:"305 km (Arlberg)", anecdote:"Berceau du ski alpin moderne — Hannes Schneider y a inventé la technique Arlberg en 1907, ancêtre de tout le ski technique moderne. Lech et Zürs sont reliés pour former l'Arlberg, le plus grand domaine d'Autriche. Neige poudreuse légendaire."},
+{id:162,name:"Lech",          region:"Autriche", massif:"Arlberg", alt:2811, lat:47.21, lon:10.14,
+ open:"Déc", created:1900, domain:"305 km (Arlberg)", anecdote:"Le village le plus cher d'Autriche — principauté de Monaco des neiges. Diana Spencer y skia avant de devenir Princesse Diana. La famille royale d'Orange-Nassau y séjourne chaque année depuis 1960. Malgré le luxe, les pistes sont authentiquement excellentes."},
+{id:163,name:"Ischgl",        region:"Autriche", massif:"Silvretta", alt:2872, lat:46.99, lon:10.28,
+ open:"Nov", created:1963, domain:"239 km de pistes", anecdote:"Connu pour ses concerts de fin de saison en plein air — Elton John, Taylor Swift, Bon Jovi ont joué à 2320m d'altitude. La Silvretta Arena relie l'Autriche à la Suisse (Samnaun). En 2020, Ischgl fut au cœur d'un scandale Covid."},
+{id:164,name:"Mayrhofen",     region:"Autriche", massif:"Zillertal", alt:2500, lat:47.17, lon:11.87,
+ open:"Déc", created:1925, domain:"630 km (Zillertal Arena)", anecdote:"La piste Harakiri, avec ses 78% de pente, est officiellement la piste ski la plus raide d'Autriche. Le Zillertalbahn, train à vapeur du 19ème siècle, remonte la vallée depuis Jenbach — une remontée dans le temps vers la Belle Époque alpine."},
+{id:165,name:"Kaprun",        region:"Autriche", massif:"Zell am See", alt:3029, lat:47.27, lon:12.76,
+ open:"Oct", created:1955, domain:"138 km (Ski Amadé)", anecdote:"Le glacier du Kitzsteinhorn permet le ski d'été de juin à octobre — 3029m de haut. Tragédie du funiculaire en 2000, avec 155 morts — accéléra les nouvelles normes de sécurité européennes. Le glacier recule visiblement : 800m en 50 ans."},
+{id:166,name:"Zell am See",   region:"Autriche", massif:"Zell am See", alt:2029, lat:47.32, lon:12.80,
+ open:"Déc", created:1938, domain:"138 km (Ski Amadé)", anecdote:"Petite ville lacustre de carte postale au bord du lac Zell — en été, on s'y baigne ; en hiver, la montagne est juste derrière. L'église Sainte-Hippolyte du 10ème siècle sur son rocher dans le lac est l'icône photographique absolue de la région."},
+{id:167,name:"Bad Gastein",   region:"Autriche", massif:"Gastein", alt:2686, lat:47.11, lon:13.13,
+ open:"Déc", created:1900, domain:"200 km (Ski Amadé)", anecdote:"Belle Époque congelée — les palaces du 19ème siècle avec leurs façades néo-baroque dominent la cascade de Gastein (75m) qui tombe en plein centre-ville. L'eau thermale radioactive (radon) attire les rhumatisants depuis l'Antiquité."},
+{id:168,name:"Obertauern",    region:"Autriche", massif:"Salzburg", alt:2350, lat:47.25, lon:13.57,
+ open:"Nov", created:1952, domain:"100 km de pistes", anecdote:"Station la plus enneigée d'Autriche — garantie d'enneigement grâce à sa position sur le col du Tauern. Les Beatles y ont tourné des scènes de Help! en 1965 — une plaque commémorative marque l'endroit où Ringo Starr se jeta dans la neige."},
+{id:169,name:"Schladming",    region:"Autriche", massif:"Dachstein", alt:2015, lat:47.39, lon:13.69,
+ open:"Déc", created:1966, domain:"760 km (Ski Amadé)", anecdote:"Les Championnats du Monde 2013 y ont transformé la ville en capitale mondiale du ski pendant deux semaines. Le slalom de nuit de Schladming, Planai Night Race, est l'une des scènes les plus spectaculaires du circuit avec ses 40 000 spectateurs et ses torches."},
+// ── ITALIE ─────────────────────────────────────────────
+{id:180,name:"Courmayeur",    region:"Italie", massif:"Val d'Aoste", alt:3456, lat:45.79, lon:6.97,
+ open:"Déc", created:1936, domain:"100 km de pistes", anecdote:"Au pied du Mont Blanc côté italien, Courmayeur possède un caractère alpin intrinsèquement différent : villages médiévaux, cuisine valdôtaine, ambiance moins fashion. La Skyway Monte Bianco monte à 3466m et offre un panorama sur toute la chaîne des Alpes."},
+{id:181,name:"Cervinia",      region:"Italie", massif:"Val d'Aoste", alt:3480, lat:45.94, lon:7.63,
+ open:"Oct", created:1936, domain:"360 km (Cervin-Zermatt)", anecdote:"Face au Cervin mais côté italien, Cervinia est reliée à Zermatt via le col du Théodule (3480m) — on peut skier deux pays en une journée. Bénéficie du glacier du Plateau Rosa ouvert 10 mois par an. Altitude garantit une neige excellente même en novembre."},
+{id:182,name:"La Thuile",     region:"Italie", massif:"Val d'Aoste", alt:2641, lat:45.72, lon:6.97,
+ open:"Déc", created:1960, domain:"150 km (La Rosière-Espace San Bernardo)", anecdote:"Village valdôtain authentique relié à La Rosière française. Ancienne mine de magnésite encore visible dans le paysage. Le Col du Mont-Cenis et le Petit-Saint-Bernard ont été des routes napoléoniennes stratégiques — histoire palpable."},
+{id:183,name:"Livigno",       region:"Italie", massif:"Lombardie", alt:3002, lat:46.54, lon:10.14,
+ open:"Nov", created:1952, domain:"115 km de pistes", anecdote:"Zone franche depuis 1939 — pas de TVA italienne. Les alcools, tabacs et carburants y sont 40% moins chers. Entourée par des sommets de 3000m, Livigno est isolée l'hiver en cas de neige. Bonne neige sèche grâce à l'altitude et le climat continental."},
+{id:184,name:"Bormio",        region:"Italie", massif:"Lombardie", alt:3012, lat:46.47, lon:10.37,
+ open:"Nov", created:1908, domain:"50 km de pistes", anecdote:"Station thermale depuis l'Antiquité romaine — les thermes de Bormio sont cités par Pline l'Ancien. La piste Stelvio, noire de descente de Coupe du Monde, fait 3,4 km avec 1000m de dénivelé. Le col du Stelvio, avec ses 48 lacets, est la route de montagne la plus spectaculaire d'Europe."},
+{id:185,name:"Cortina d'Ampezzo", region:"Italie", massif:"Dolomites", alt:3244, lat:46.54, lon:12.14,
+ open:"Déc", created:1902, domain:"140 km de pistes", anecdote:"La Rolls-Royce des stations italiennes — JO 1956, élite mondiale, boutiques Dior et Bulgari en station. Les Dolomites qui l'entourent (UNESCO) sont des récifs coralliens fossilisés vieux de 250 millions d'années. La lumière rose au coucher de soleil (enrosadira) est un phénomène unique."},
+{id:186,name:"Madonna di Campiglio", region:"Italie", massif:"Trentino", alt:3000, lat:46.23, lon:10.82,
+ open:"Nov", created:1901, domain:"150 km de pistes", anecdote:"Terrain de jeu de l'aristocratie européenne depuis l'Autriche-Hongrie — l'Empereur François-Joseph I y venait chaque hiver. Les 3 Zinnen (Tre Cime di Lavaredo) et le groupe du Brenta sont visibles depuis les sommets. Alberto Tomba y a couru ses premières courses."},
+{id:187,name:"Val Gardena",   region:"Italie", massif:"Dolomites", alt:2518, lat:46.55, lon:11.67,
+ open:"Déc", created:1930, domain:"175 km (Dolomiti Superski)", anecdote:"La Sellaronda, tour des Dolomites à ski en une journée (40 km de pistes, 4 cols), est l'une des grandes aventures du ski mondial. Les Ladins, peuple autochtone des Dolomites, parlent encore le ladin — langue romane unique survivante."},
+{id:188,name:"Alta Badia",    region:"Italie", massif:"Dolomites", alt:3026, lat:46.57, lon:11.90,
+ open:"Déc", created:1946, domain:"130 km (Dolomiti Superski)", anecdote:"La Gran Risa, slalom géant de Coupe du Monde dans les Dolomites, est l'une des pistes les plus techniques du circuit avec ses bosse et sa neige dure. Les refuges d'altitude servent une cuisine italienne étoilée — orecchiette aux truffes à 2500m."},
+{id:189,name:"Sestrière",     region:"Italie", massif:"Piémont", alt:2823, lat:44.96, lon:6.88,
+ open:"Déc", created:1931, domain:"400 km (Voie Lactée)", anecdote:"Construite en 1931 par Fiat — Giovanni Agnelli père a fait bâtir les deux tours rondes emblématiques pour ses ouvriers. JO Turin 2006. La Via Lattea (Voie Lactée) relie 5 stations franco-italiennes sur 400 km — l'une des plus grandes connexions trans-frontalières."},
+{id:190,name:"Bardonecchia",  region:"Italie", massif:"Piémont", alt:2800, lat:45.08, lon:6.70,
+ open:"Déc", created:1935, domain:"140 km de pistes", anecdote:"Terminus du tunnel du Fréjus (13 km) qui relie France et Italie depuis 1980. Station olympique de Turin 2006 — les épreuves de slalom géant s'y sont déroulées. Les pistes de Jafferau (2800m) offrent une vue de 360° sur les Alpes franco-italiennes."},
+{id:191,name:"Clavière",      region:"Italie", massif:"Piémont", alt:2800, lat:44.94, lon:6.75,
+ open:"Déc", created:1898, domain:"400 km (Voie Lactée)", anecdote:"Premier poste de douane italo-français — pendant la 2ème Guerre mondiale, des passeurs faisaient passer des réfugiés juifs par ici vers la Suisse. Le Col de Montgenèvre à 50m de la frontière est le plus facile des Alpes, historiquement le plus emprunté."},
+// ── MASSIF CENTRAL ─────────────────────────────────────
+{id:200,name:"Super-Besse",   region:"Massif Central", massif:"Auvergne", alt:1350, lat:45.50, lon:2.82,
+ open:"Déc", created:1960, domain:"45 km de pistes", anecdote:"Sur les flancs du Puy de la Perdrix face au puy de Sancy. Les volcans éteints du Massif Central créent un paysage de ski unique — nulle part ailleurs en France on ne skie sur un volcan. Le lac Pavin, à 15 minutes, est le lac volcanique le plus récent d'Europe."},
+{id:201,name:"Le Mont-Dore",  region:"Massif Central", massif:"Auvergne", alt:1850, lat:45.57, lon:2.80,
+ open:"Déc", created:1890, domain:"45 km de pistes", anecdote:"Station thermale depuis les Romains — les Thermes du Mont-Dore datent de 1817, néo-byzantins et baroques, sont classés monument historique. Le Puy de Sancy (1886m), point culminant du Massif Central, est accessible depuis la station en télécabine."},
+{id:202,name:"Lioran",        region:"Massif Central", massif:"Cantal", alt:1855, lat:45.11, lon:2.74,
+ open:"Déc", created:1938, domain:"60 km de pistes", anecdote:"Sur les flancs du Plomb du Cantal (1855m), stratovolcan érodé. Le tunnel du Lioran, creusé en 1839, fut le premier tunnel ferroviaire de France — exploit technique de l'époque. Fromage Cantal AOP et Salers produits dans les burons autour des pistes."},
+{id:203,name:"Laguiole",      region:"Massif Central", massif:"Aubrac", alt:1300, lat:44.68, lon:2.85,
+ open:"Déc", created:1968, domain:"20 km de pistes", anecdote:"Sur le plateau de l'Aubrac, paysage de basalte et de landes à perte de vue. La coutelerie Laguiole est née ici en 1829 — les couteaux de poche y sont toujours fabriqués à la main. L'aligot, spécialité aveyronnaise, se mange dans les auberges à la descente des pistes."},
+// ── VOSGES & JURA ──────────────────────────────────────
+{id:210,name:"La Bresse-Hohneck", region:"Vosges", massif:"Vosges", alt:1366, lat:47.99, lon:6.93,
+ open:"Déc", created:1935, domain:"40 km de pistes", anecdote:"Au pied du Hohneck (1363m), point culminant des Vosges. La Bresse est aussi connue pour ses fromages fermiers et ses estaminets. Première station de ski des Vosges, avec ses chaumes (alpages vosgiens) qui donnent un paysage doux et arrondi unique."},
+{id:211,name:"Gérardmer",     region:"Vosges", massif:"Vosges", alt:1228, lat:48.07, lon:6.88,
+ open:"Déc", created:1878, domain:"45 km de pistes", anecdote:"La Venise des Vosges — le lac de Gérardmer est le plus grand lac naturel de Lorraine. La station a été entièrement détruite en 1944 lors de la retraite allemande — les Vosgiens ont tout reconstruit à partir de rien. Festival du film fantastique mondialement réputé."},
+{id:212,name:"Les Rousses",   region:"Jura", massif:"Jura", alt:1670, lat:46.48, lon:6.06,
+ open:"Déc", created:1952, domain:"50 km alpin + 200 km nordique", anecdote:"Sur le plateau du Jura suisse à 1100m, Les Rousses forme une station complète avec pistes alpines ET 200 km de ski de fond. Le fort des Rousses, forteresse napoléonienne du 19ème siècle, est désormais une fromagerie à affinage — le Comté y est stocké dans les anciennes casernes."},
+{id:213,name:"Métabief",      region:"Jura", massif:"Jura", alt:1423, lat:46.77, lon:6.35,
+ open:"Déc", created:1936, domain:"40 km de pistes", anecdote:"Dominant le lac de Saint-Point, le plus grand lac naturel de Franche-Comté. Le mont d'Or (1463m) offre une vue sur les Alpes et le lac Léman par temps clair. La Grande Traversée du Jura (GTJ) passe ici — 450 km de ski nordique de Mandeure à Giron."},
+// ── ESPAGNE & ANDORRE ──────────────────────────────────
+{id:220,name:"Baqueira Beret", region:"Espagne", massif:"Pyrénées espagnoles", alt:2510, lat:42.69, lon:0.95,
+ open:"Déc", created:1964, domain:"167 km de pistes", anecdote:"Station préférée de la famille royale espagnole Juan Carlos I y skia depuis 1964 et a popularisé la station. La Fête de la Saint-Blaise d'Arties est l'un des événements culturels occitans les plus vivants des Pyrénées — la Val d'Aran est officiellement occitanophone."},
+{id:221,name:"Sierra Nevada",  region:"Espagne", massif:"Sierra Nevada", alt:3300, lat:37.10, lon:-3.40,
+ open:"Déc", created:1964, domain:"110 km de pistes", anecdote:"La station la plus méridionale d'Europe et la plus haute d'Espagne — on peut voir la mer Méditerranée depuis les pistes. À 33 km de Grenade et l'Alhambra. Organisatrice des Championnats du Monde 1996. Arabismes dans les noms de villages alentours."},
+{id:222,name:"La Molina",      region:"Espagne", massif:"Pyrénées espagnoles", alt:2537, lat:42.34, lon:1.94,
+ open:"Déc", created:1943, domain:"70 km de pistes", anecdote:"Première station de ski d'Espagne, fondée en 1943. Site des premiers Championnats d'Espagne de ski. La Masella voisine permet un domaine combiné exceptionnel avec une des meilleures neiges de Catalogne. Vue sur le massif du Pedraforca."},
+{id:223,name:"Masella",        region:"Espagne", massif:"Pyrénées espagnoles", alt:2535, lat:42.35, lon:1.93,
+ open:"Déc", created:1973, domain:"70 km (avec La Molina)", anecdote:"Connue pour ses pistes de nuit — ouvertes jusqu'à 22h sur 10 km éclairés. Ambiance barcelonaise le week-end : plus festive et moins chic que les stations françaises voisines. Vue sur le Cadí-Moixeró et la plaine du Segre."},
+{id:224,name:"Cerler",         region:"Espagne", massif:"Pyrénées espagnoles", alt:2630, lat:42.60, lon:0.55,
+ open:"Déc", created:1972, domain:"80 km de pistes", anecdote:"Station aragonaise perchée à 1500m face aux sommets de l'Aneto (3404m), toit des Pyrénées. Village médiéval de Cerler avec ses ruelles pavées au cœur de la station moderne. L'Espagnol du coin cuisine la migas (chapelure frite) dans les refuges — délicieux après le ski."},
+{id:225,name:"Astún",          region:"Espagne", massif:"Pyrénées espagnoles", alt:2200, lat:42.76, lon:-0.52,
+ open:"Déc", created:1975, domain:"55 km de pistes", anecdote:"Jumelle de Candanchú, en haut du col du Somport — la frontière franco-espagnole passe au milieu de la vallée. Station de référence des Aragonais avec sa neige sèche. En été, la Route Romane du Somport fait partie du Chemin de Saint-Jacques-de-Compostelle."},
+{id:226,name:"Candanchú",      region:"Espagne", massif:"Pyrénées espagnoles", alt:2400, lat:42.77, lon:-0.52,
+ open:"Déc", created:1928, domain:"60 km de pistes", anecdote:"La doyenne des stations aragonaises, fondée en 1928. Le col du Somport, à deux pas, était un passage romain stratégique — les légions y ont marché. Les loups ibériques réintroduits dans les Pyrénées espagnoles font parfois leur apparition à cette altitude."},
+{id:227,name:"Grandvalira",    region:"Andorre", massif:"Andorre", alt:2640, lat:42.56, lon:1.73,
+ open:"Déc", created:1957, domain:"210 km de pistes", anecdote:"Le plus grand domaine skiable des Pyrénées. L'Andorre est une co-principauté indépendante gouvernée conjointement par le Président français et l'Évêque d'Urgell — structure médiévale unique. Shopping hors-taxes attire autant que les pistes."},
+{id:228,name:"Vallnord-Pal Arinsal", region:"Andorre", massif:"Andorre", alt:2625, lat:42.58, lon:1.47,
+ open:"Déc", created:1960, domain:"65 km de pistes", anecdote:"Vue sur les Pyrénées catalanes et la plaine de la Seu d'Urgell. Pal est plus familial, Arinsal plus orienté jeunes et après-ski animé. L'Andorre, avec ses 468 km², est l'un des plus petits États d'Europe mais possède un des meilleurs rapports neige/accessibilité des Pyrénées."},
+];
+
+// ════════════════════════════════════════════════════════
+const REGIONS = [...new Set(STATIONS.map(s=>s.region))];
+const REGION_BOUNDS={
+  'Alpes du Nord':[[45.0,5.5],[46.5,7.2]],
+  'Alpes du Sud': [[43.8,5.0],[45.4,7.4]],
+  'Pyrénées':     [[42.3,-1.3],[43.3,2.5]],
+  'Suisse':       [[45.9,6.8],[47.1,10.1]],
+  'Autriche':     [[46.4,9.8],[47.8,14.0]],
+  'Italie':       [[43.8,6.5],[47.0,12.6]],
+  'Massif Central':[[44.4,2.4],[46.1,3.6]],
+  'Vosges':       [[47.6,6.6],[48.4,7.3]],
+  'Jura':         [[46.2,5.8],[47.1,6.7]],
+  'Espagne':      [[36.7,-3.7],[43.1,3.1]],
+  'Andorre':      [[42.4,1.4],[42.7,1.9]],
+};
+
+// ════════════ STATE ════════════
+let visitedIds = new Set(JSON.parse(localStorage.getItem('ski_visited')||'[]'));
+let staysData  = JSON.parse(localStorage.getItem('ski_stays')||'{}');
+let regionFilter = 'all';
+let currentSheet = null;
+
+function save(){
+  localStorage.setItem('ski_visited',JSON.stringify([...visitedIds]));
+  localStorage.setItem('ski_stays',JSON.stringify(staysData));
+}
+
+// ════════════ MAP ════════════
+let map, markers={}, tileLayers={}, currentLayer='topo';
+
+const TILE_DEFS={
+  topo:      {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', filter:'brightness(0.8) saturate(0.7) sepia(0.15)'},
+  satellite: {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', filter:'brightness(0.85) saturate(0.8)'},
+  street:    {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', filter:'brightness(0.7) saturate(0.6) sepia(0.2)'},
+  winter:    {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', filter:'brightness(0.92) saturate(0.15) hue-rotate(180deg) contrast(1.05)'},
+};
+
+function initMap(){
+  map=L.map('leaflet-map',{center:[45.8,7.5],zoom:7,zoomControl:false,attributionControl:false});
+  Object.entries(TILE_DEFS).forEach(([key,def])=>{
+    tileLayers[key]=L.tileLayer(def.url,{maxZoom:17,minZoom:4});
+  });
+  tileLayers['topo'].addTo(map);
+  applyTileFilter('topo');
+  L.control.zoom({position:'bottomleft'}).addTo(map);
+
+  STATIONS.forEach(s=>{
+    const m=L.marker([s.lat,s.lon],{icon:mkIcon(visitedIds.has(s.id))})
+      .bindPopup(mkMiniPopup(s),{closeButton:false,maxWidth:200})
+      .addTo(map);
+    m.on('popupopen',()=>{
+      document.querySelector('.mini-popup')?.addEventListener('click',()=>{
+        map.closePopup();
+        openSheet(s);
+      });
+    });
+    markers[s.id]=m;
+  });
+  renderRegionDropdown();
+}
+
+function applyTileFilter(key){
+  const pane=document.querySelector('.leaflet-tile-pane');
+  if(pane) pane.style.filter=TILE_DEFS[key]?.filter||'';
+}
+
+function setLayer(key){
+  if(tileLayers[currentLayer]) map.removeLayer(tileLayers[currentLayer]);
+  tileLayers[key].addTo(map);
+  currentLayer=key;
+  applyTileFilter(key);
+  document.querySelectorAll('.layer-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('lb-'+key)?.classList.add('active');
+}
+
+function mkIcon(v){
+  const sz=v?14:9;
+  return L.divIcon({
+    className:'',
+    html:`<div class="ski-marker ${v?'visited':'unvisited'}" style="width:${sz}px;height:${sz}px"></div>`,
+    iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]
+  });
+}
+
+function mkMiniPopup(s){
+  return `<div class="mini-popup">
+    <div class="mini-popup-name">${s.name}</div>
+    <div class="mini-popup-meta">${s.massif} · ${s.alt}m</div>
+    <div class="mini-popup-hint">→ Cliquer pour voir la fiche</div>
+  </div>`;
+}
+
+// ════════════ STATION SHEET ════════════
+function openSheet(s){
+  currentSheet=s;
+  document.getElementById('sh-name').textContent=s.name;
+  document.getElementById('sh-massif').textContent=`${s.massif} · ${s.region}`;
+  document.getElementById('sh-alt').innerHTML=`▲ ${s.alt}m`;
+  document.getElementById('sh-anecdote').textContent=s.anecdote||'—';
+
+  // Info grid
+  const grid=document.getElementById('sh-info-grid');
+  grid.innerHTML=`
+    <div class="info-card"><div class="ic-label">Ouverture</div><div class="ic-val">${s.open||'—'}</div></div>
+    <div class="info-card"><div class="ic-label">Créée en</div><div class="ic-val">${s.created||'—'}</div></div>
+    <div class="info-card" style="grid-column:1/-1"><div class="ic-label">Domaine</div><div class="ic-val">${s.domain||'—'}</div></div>`;
+
+  refreshSheetBtn();
+  renderStays(s.id);
+  document.getElementById('stay-from').value='';
+  document.getElementById('stay-to').value='';
+  document.getElementById('station-sheet').classList.add('open');
+}
+
+function closeSheet(){
+  document.getElementById('station-sheet').classList.remove('open');
+  currentSheet=null;
+}
+
+function refreshSheetBtn(){
+  if(!currentSheet) return;
+  const v=visitedIds.has(currentSheet.id);
+  const btn=document.getElementById('sh-toggle-btn');
+  btn.textContent=v?'✕ Retirer de mes stations':'✓ Marquer comme skié';
+  btn.className='sheet-visited-btn '+(v?'remove':'add');
+}
+
+function sheetToggle(){
+  if(!currentSheet) return;
+  toggleStation(currentSheet.id);
+  refreshSheetBtn();
+  const m=markers[currentSheet.id];
+  if(m){m.setIcon(mkIcon(visitedIds.has(currentSheet.id)));m.setPopupContent(mkMiniPopup(currentSheet));}
+}
+
+function renderStays(stationId){
+  const stays=(staysData[stationId]||[]);
+  const el=document.getElementById('sh-stays');
+  el.innerHTML='';
+  stays.forEach((st,i)=>{
+    const item=document.createElement('div');
+    item.className='stay-item';
+    item.innerHTML=`<span class="stay-dates">📅 ${fmt(st.from)}${st.to&&st.to!==st.from?' → '+fmt(st.to):''}</span>
+      <button class="stay-del" onclick="delStay(${stationId},${i})">✕</button>`;
+    el.appendChild(item);
+  });
+  if(!stays.length){
+    el.innerHTML='<div style="font-size:11px;color:var(--muted);padding:4px 0">Aucun séjour enregistré</div>';
+  }
+}
+
+function fmt(d){
+  if(!d) return '?';
+  const [y,m,day]=d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function addStay(){
+  if(!currentSheet) return;
+  const from=document.getElementById('stay-from').value;
+  const to=document.getElementById('stay-to').value;
+  if(!from){toast('Indique au moins une date d\'arrivée');return;}
+  const id=currentSheet.id;
+  if(!staysData[id]) staysData[id]=[];
+  staysData[id].push({from,to:to||from});
+  staysData[id].sort((a,b)=>a.from.localeCompare(b.from));
+  save();
+  renderStays(id);
+  document.getElementById('stay-from').value='';
+  document.getElementById('stay-to').value='';
+  // Auto-mark as visited
+  if(!visitedIds.has(id)){
+    visitedIds.add(id); save(); updateStats(); renderRegionDropdown();
+    const m=markers[id]; if(m){m.setIcon(mkIcon(true));m.setPopupContent(mkMiniPopup(currentSheet));}
+    refreshSheetBtn();
+    toast(`✓ ${currentSheet.name} marquée comme visitée`);
+  } else {
+    toast('Séjour ajouté !');
+  }
+}
+
+function delStay(stationId,idx){
+  staysData[stationId]?.splice(idx,1);
+  save(); renderStays(stationId);
+}
+
+// ════════════ REGION DROPDOWN ════════════
+function renderRegionDropdown(){
+  const dd=document.getElementById('region-dropdown');
+  dd.innerHTML=`<div class="rd-title">Zone</div>`;
+  const all=document.createElement('button');
+  all.className='rd-btn active'; all.id='rd-all';
+  all.innerHTML=`<span>Tout</span><span class="rd-count">${visitedIds.size}</span>`;
+  all.onclick=()=>{setActiveRd(null,'all');map.flyTo([45.8,7.5],6,{duration:1});};
+  dd.appendChild(all);
+  REGIONS.forEach(r=>{
+    const tot=STATIONS.filter(s=>s.region===r).length;
+    const done=STATIONS.filter(s=>s.region===r&&visitedIds.has(s.id)).length;
+    const b=document.createElement('button');
+    b.className='rd-btn'; b.dataset.r=r;
+    b.innerHTML=`<span>${r}</span><span class="rd-count">${done}/${tot}</span>`;
+    b.onclick=()=>{setActiveRd(r);const bd=REGION_BOUNDS[r];if(bd)map.flyToBounds(bd,{padding:[30,30],duration:1});};
+    dd.appendChild(b);
+  });
+}
+
+function setActiveRd(region,special){
+  document.querySelectorAll('.rd-btn').forEach(b=>b.classList.remove('active'));
+  if(special==='all') document.getElementById('rd-all')?.classList.add('active');
+  else document.querySelector(`.rd-btn[data-r="${region}"]`)?.classList.add('active');
+}
+
+function toggleRegionDropdown(){
+  document.getElementById('gear-btn').classList.toggle('open');
+  document.getElementById('region-dropdown').classList.toggle('open');
+}
+
+// ════════════ TOGGLE ════════════
+function toggleStation(id){
+  if(visitedIds.has(id)) visitedIds.delete(id);
+  else{visitedIds.add(id);toast('✓ '+STATIONS.find(s=>s.id===id)?.name);}
+  save(); updateStats(); renderRegionDropdown();
+}
+
+// ════════════ FUZZY SEARCH ════════════
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function fuzzy(str,q){
+  str=norm(str);q=norm(q);
+  if(!q) return{ok:true,score:0};
+  if(str.includes(q)) return{ok:true,score:100-str.indexOf(q)};
+  let qi=0;for(let i=0;i<str.length&&qi<q.length;i++) if(str[i]===q[qi]) qi++;
+  return qi===q.length?{ok:true,score:40}:{ok:false,score:0};
+}
+function hl(text,q){
+  if(!q) return text;
+  const idx=norm(text).indexOf(norm(q));
+  if(idx<0) return text;
+  return text.slice(0,idx)+`<mark>${text.slice(idx,idx+q.length)}</mark>`+text.slice(idx+q.length);
+}
+
+function renderList(){
+  const q=document.getElementById('search-input').value.trim();
+  let base=regionFilter==='all'?STATIONS:STATIONS.filter(s=>s.region===regionFilter);
+  let res=base.map(s=>{
+    const sc=Math.max(fuzzy(s.name,q).score,fuzzy(s.massif,q).score,fuzzy(s.region,q).score);
+    const ok=!q||fuzzy(s.name,q).ok||fuzzy(s.massif,q).ok||fuzzy(s.region,q).ok;
+    return{s,ok,sc};
+  }).filter(r=>r.ok).sort((a,b)=>b.sc-a.sc||a.s.name.localeCompare(b.s.name));
+
+  document.getElementById('res-info').textContent=`${res.length} station${res.length>1?'s':''}`;
+  const list=document.getElementById('station-list');
+  list.innerHTML='';
+  res.slice(0,150).forEach(({s})=>{
+    const v=visitedIds.has(s.id);
+    const stays=(staysData[s.id]||[]).length;
+    const el=document.createElement('div');
+    el.className='s-item'+(v?' visited':'');
+    el.innerHTML=`<div>
+      <div class="s-name">${hl(s.name,q)}</div>
+      <div class="s-meta">${s.massif} · ${s.region} · ${s.alt}m${stays?' · '+stays+' séjour'+(stays>1?'s':''):''}
+      </div></div>
+      <div class="s-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div>`;
+    el.onclick=()=>{
+      toggleStation(s.id);
+      el.classList.toggle('visited',visitedIds.has(s.id));
+      const m=markers[s.id];if(m){m.setIcon(mkIcon(visitedIds.has(s.id)));m.setPopupContent(mkMiniPopup(s));}
+    };
+    list.appendChild(el);
+  });
+  if(res.length>150){const m=document.createElement('div');m.style.cssText='text-align:center;color:var(--muted);font-size:11px;padding:14px';m.textContent=`+${res.length-150} stations, affinez la recherche`;list.appendChild(m);}
+}
+
+function initFilters(){
+  const row=document.getElementById('filter-row');row.innerHTML='';
+  const mk=(lbl,val)=>{const b=document.createElement('button');b.className='filter-chip'+(regionFilter===val?' active':'');b.textContent=lbl;b.onclick=()=>{regionFilter=val;initFilters();renderList();};row.appendChild(b);};
+  mk('Tout','all');REGIONS.forEach(r=>mk(r,r));
+}
+
+// ════════════ DONE LIST ════════════
+function renderDoneList(){
+  const visited=STATIONS.filter(s=>visitedIds.has(s.id));
+  document.getElementById('list-sub').textContent=`${visited.length} station${visited.length>1?'s':''} visitée${visited.length>1?'s':''}`;
+  const el=document.getElementById('done-list');
+  if(!visited.length){el.innerHTML=`<div class="empty"><div class="empty-icon">⛷️</div><div class="empty-title">Aucune station encore</div><div class="empty-sub">Va dans "Ajouter" pour commencer</div></div>`;return;}
+  const byR={};visited.forEach(s=>{(byR[s.region]=byR[s.region]||[]).push(s);});
+  el.innerHTML='';
+  Object.entries(byR).forEach(([r,ss])=>{
+    const lbl=document.createElement('div');lbl.className='group-label';
+    lbl.innerHTML=`${r} <span style="color:var(--accent)">${ss.length}</span>`;el.appendChild(lbl);
+    ss.sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{
+      const stays=(staysData[s.id]||[]).length;
+      const item=document.createElement('div');item.className='d-item';
+      item.innerHTML=`<div>
+        <div class="d-name">${s.name}</div>
+        <div class="d-meta">${s.massif} · ${s.alt}m</div>
+        ${stays?`<div class="d-stays">⛷ ${stays} séjour${stays>1?'s':''}</div>`:''}
+      </div>
+      <button class="del-btn" title="Retirer"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l8 8M9 1L1 9"/></svg></button>`;
+      item.querySelector('.del-btn').onclick=e=>{e.stopPropagation();visitedIds.delete(s.id);save();updateStats();const m=markers[s.id];if(m){m.setIcon(mkIcon(false));m.setPopupContent(mkMiniPopup(s));}renderDoneList();renderRegionDropdown();};
+      item.onclick=(e)=>{if(e.target.closest('.del-btn')) return;showPage('map');setTimeout(()=>{map.setView([s.lat,s.lon],12);const m=markers[s.id];if(m)m.openPopup();},200);};
+      el.appendChild(item);
+    });
+  });
+}
+
+// ════════════ STATS ════════════
+function updateStats(){
+  const n=visitedIds.size;
+  document.getElementById('stats-pill').innerHTML=`<strong>${n}</strong> station${n>1?'s':''}`;
+}
+
+// ════════════ PAGES ════════════
+function showPage(name){
+  closeMenu();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('[id^="mi-"]').forEach(m=>m.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('mi-'+name).classList.add('active');
+  if(name==='map'){setTimeout(()=>map.invalidateSize(),60);renderRegionDropdown();}
+  if(name==='add'){initFilters();renderList();}
+  if(name==='list') renderDoneList();
+}
+
+// ════════════ MENUS ════════════
+function toggleMenu(){
+  document.getElementById('burger').classList.toggle('open');
+  document.getElementById('nav-menu').classList.toggle('open');
+}
+function closeMenu(){
+  document.getElementById('burger').classList.remove('open');
+  document.getElementById('nav-menu').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#burger')&&!e.target.closest('#nav-menu')) closeMenu();
+  if(!e.target.closest('#gear-btn')&&!e.target.closest('#region-dropdown')){
+    document.getElementById('gear-btn').classList.remove('open');
+    document.getElementById('region-dropdown').classList.remove('open');
+  }
+});
+
+// ════════════ TOAST ════════════
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ════════════ INIT ════════════
+window.addEventListener('DOMContentLoaded',()=>{initMap();updateStats();});
+</script>
+</body>
+</html>
