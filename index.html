@@ -381,8 +381,8 @@ mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
     <div class="auth-logo">Peak<em>Done</em></div>
     <div class="auth-title">Suis tes stations sur tous tes appareils</div>
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
+      <button class="auth-tab active" id="tab-login">Connexion</button>
+      <button class="auth-tab" id="tab-signup">Créer un compte</button>
     </div>
     <div class="auth-fields">
       <input class="auth-input" id="auth-email" type="email" placeholder="Adresse email" autocomplete="email">
@@ -391,7 +391,7 @@ mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
     </div>
     <div class="auth-err" id="auth-err"></div>
     <div class="auth-ok" id="auth-ok"></div>
-    <button class="auth-btn" id="auth-submit-btn" onclick="authSubmit()">Se connecter</button>
+    <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
   </div>
 </div>
 
@@ -1363,6 +1363,13 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 
 // ════════════ INIT ════════════
 window.addEventListener('DOMContentLoaded', async () => {
+  // Wire auth buttons via event listeners (not inline onclick)
+  document.getElementById('tab-login').addEventListener('click', () => switchAuthTab('login'));
+  document.getElementById('tab-signup').addEventListener('click', () => switchAuthTab('signup'));
+  document.getElementById('auth-submit-btn').addEventListener('click', authSubmit);
+  document.getElementById('auth-pw').addEventListener('keydown', e => { if(e.key==='Enter') authSubmit(); });
+  document.getElementById('auth-pw2').addEventListener('keydown', e => { if(e.key==='Enter') authSubmit(); });
+
   // Check if already logged in
   const { data: { session } } = await supa.auth.getSession();
   if (session?.user) {
