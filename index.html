@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>PeakDone</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PeakDone">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230d1117'/><text x='96' y='130' font-size='110' text-anchor='middle'>🎿</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -217,6 +223,37 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px
 .s-preview.open{display:block;}
 .s-preview-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-style:normal;font-size:10px;color:var(--muted);}
 .s-preview-meta span{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2px 6px;}
+/* ─── STATS PAGE ─── */
+.stats-inner{padding:20px 16px 90px;max-width:680px;margin:0 auto;overflow-y:auto;height:100%;}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;}
+@media(min-width:480px){.stat-grid{grid-template-columns:repeat(4,1fr);}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.stat-card .sc-val{font-family:'Playfair Display',serif;font-size:28px;color:var(--accent2);line-height:1;}
+.stat-card .sc-lbl{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;}
+.stat-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.stat-block-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px;}
+/* Bar chart */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.bar-label{font-size:11px;color:var(--text2);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.bar-count{font-size:11px;color:var(--muted);width:28px;text-align:right;flex-shrink:0;}
+/* Share card */
+.share-card{background:linear-gradient(135deg,#0d1117 0%,#141b24 50%,#1c2534 100%);border:1px solid var(--border2);border-radius:16px;padding:24px;text-align:center;position:relative;overflow:hidden;}
+.share-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(91,163,208,.08) 0%,transparent 60%);pointer-events:none;}
+.share-logo{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;color:var(--muted);margin-bottom:12px;}
+.share-logo em{color:var(--accent);font-style:normal;}
+.share-name{font-size:13px;color:var(--text2);margin-bottom:8px;}
+.share-big{font-family:'Playfair Display',serif;font-size:56px;color:var(--snow);line-height:1;}
+.share-label{font-size:11px;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;}
+.share-continents{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.share-continent-pill{font-size:10px;padding:3px 10px;border-radius:100px;background:rgba(91,163,208,.12);border:1px solid rgba(91,163,208,.2);color:var(--accent2);}
+.share-achievements{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.share-ach{font-size:18px;}
+.share-footer{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.share-btn{flex:1;padding:10px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;}
+.share-btn:hover{border-color:var(--accent);color:var(--accent);}
+
 .achievements-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
 .achievement{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 13px;transition:all .3s;}
 .achievement.unlocked{border-color:var(--gold);background:rgba(126,200,212,.07);}
@@ -257,6 +294,28 @@ mark{background:rgba(91,163,208,.22);color:var(--accent2);border-radius:2px;}
 .sync-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:4px;animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
+.offline-banner{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1c2534;border:1px solid #354a62;color:#9ab0c4;font-size:11px;padding:6px 14px;border-radius:100px;z-index:8000;display:none;gap:6px;align-items:center;}
+.offline-banner.show{display:flex;}
+.sync-status{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);font-size:11px;padding:5px 14px;border-radius:100px;z-index:8001;opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap;}
+.sync-status.sync-ok{background:rgba(91,163,208,.15);border:1px solid rgba(91,163,208,.3);color:var(--accent2);}
+.sync-status.sync-err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;}
+
+/* RESPONSIVE DESKTOP */
+@media(min-width:768px){
+  .station-sheet{width:420px;right:-440px;}
+  .station-sheet.open{right:0;}
+  #page-add .add-inner,#page-list .list-inner,#page-stats .stats-inner{max-width:680px;margin:0 auto;padding:24px 32px 90px;}
+  .info-grid{grid-template-columns:repeat(3,1fr);}
+  nav{padding:0 32px;}
+  .auth-box{max-width:420px;}
+  .stat-grid{grid-template-columns:repeat(4,1fr);}
+}
+@media(min-width:1024px){
+  #page-map{display:grid;grid-template-columns:1fr 360px;height:100%;}
+  #leaflet-map{grid-column:1;grid-row:1;height:100%;}
+  .station-sheet{position:relative;right:0!important;width:360px;height:100%;grid-column:2;grid-row:1;display:flex!important;border-left:1px solid var(--border);}
+  .layer-controls,.map-controls{z-index:600;}
+}
 </style>
 </head>
 <body>
@@ -275,6 +334,7 @@ mark{background:rgba(91,163,208,.22);color:var(--accent2);border-radius:2px;}
     <div class="menu-item active" id="mi-map" onclick="showPage('map')"><span class="mi-icon">🗺️</span> Carte</div>
     <div class="menu-item" id="mi-add" onclick="showPage('add')"><span class="mi-icon">＋</span> Ajouter une station</div>
     <div class="menu-item" id="mi-list" onclick="showPage('list')"><span class="mi-icon">⛷️</span> Mes stations</div>
+    <div class="menu-item" id="mi-stats" onclick="showPage('stats')"><span class="mi-icon">📊</span> Stats & Partage</div>
   </div>
 </nav>
 
@@ -379,6 +439,55 @@ mark{background:rgba(91,163,208,.22);color:var(--accent2);border-radius:2px;}
   </div>
 </div>
 
+<!-- STATS -->
+<div id="page-stats" class="page">
+  <div class="stats-inner" id="stats-inner">
+    <div class="page-title">Stats & Partage</div>
+    <div class="page-sub" id="stats-sub">Tes chiffres</div>
+
+    <!-- Big numbers -->
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <!-- Continent bar chart -->
+    <div class="stat-block">
+      <div class="stat-block-title">Par continent</div>
+      <div id="chart-continents"></div>
+    </div>
+
+    <!-- Top regions -->
+    <div class="stat-block">
+      <div class="stat-block-title">Tes régions</div>
+      <div id="chart-regions"></div>
+    </div>
+
+    <!-- Altitude histogram -->
+    <div class="stat-block">
+      <div class="stat-block-title">Altitude moyenne</div>
+      <div id="chart-altitude"></div>
+    </div>
+
+    <!-- Share card -->
+    <div class="stat-block">
+      <div class="stat-block-title">Partager</div>
+      <div class="share-card" id="share-card">
+        <div class="share-logo">Peak<em>Done</em></div>
+        <div class="share-name" id="share-name">—</div>
+        <div class="share-big" id="share-big">0</div>
+        <div class="share-label">stations visitées</div>
+        <div class="share-continents" id="share-continents"></div>
+        <div class="share-achievements" id="share-achievements"></div>
+        <div class="share-footer">peakdone.netlify.app</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="share-btn" onclick="copyShareLink()">🔗 Copier le lien</button>
+        <button class="share-btn" onclick="downloadShareCard()">📷 Télécharger</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="offline-banner" id="offline-banner">📡 Mode hors connexion — données locales</div>
+<div class="sync-status" id="sync-status"></div>
 <div class="toast" id="toast"></div>
 
 <!-- AUTH MODAL — placé en dernier pour être au-dessus de tout -->
@@ -1352,42 +1461,93 @@ async function signOut() {
 }
 
 // ════════════ CLOUD SYNC ════════════
+function syncToast(msg, err=false) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'sync-status ' + (err ? 'sync-err' : 'sync-ok');
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
 async function loadFromCloud() {
   const uid = currentUser.id;
-  // Load visited
-  const { data: vis } = await supa.from('visited_stations').select('station_id').eq('user_id', uid);
-  visitedIds = new Set((vis||[]).map(r => r.station_id));
-  // Load stays
-  const { data: st } = await supa.from('stays').select('*').eq('user_id', uid);
-  staysData = {};
-  (st||[]).forEach(r => {
-    if (!staysData[r.station_id]) staysData[r.station_id] = [];
-    staysData[r.station_id].push({ id: r.id, from: r.date_from, to: r.date_to });
-  });
-  // Update markers if map already inited
-  Object.entries(markers).forEach(([id, m]) => {
-    m.setIcon(mkIcon(visitedIds.has(parseInt(id))));
-  });
-  updateStats();
-  renderRegionDropdown();
+  try {
+    const [visRes, stRes] = await Promise.all([
+      supa.from('visited_stations').select('station_id').eq('user_id', uid),
+      supa.from('stays').select('*').eq('user_id', uid)
+    ]);
+    if (visRes.error) throw visRes.error;
+    if (stRes.error)  throw stRes.error;
+    visitedIds = new Set((visRes.data||[]).map(r => r.station_id));
+    staysData = {};
+    (stRes.data||[]).forEach(r => {
+      if (!staysData[r.station_id]) staysData[r.station_id] = [];
+      staysData[r.station_id].push({ id: r.id, from: r.date_from, to: r.date_to });
+    });
+    Object.entries(markers).forEach(([id, m]) => {
+      m.setIcon(mkIcon(visitedIds.has(parseInt(id))));
+    });
+    updateStats();
+    renderRegionDropdown();
+  } catch(e) {
+    console.error('loadFromCloud:', e);
+    syncToast('⚠ Erreur de chargement — données locales utilisées', true);
+  }
 }
 
 async function cloudAddVisited(stationId) {
   if (!currentUser) return;
-  await supa.from('visited_stations').upsert({ user_id: currentUser.id, station_id: stationId }, { onConflict: 'user_id,station_id' });
+  try {
+    const { error } = await supa.from('visited_stations').upsert(
+      { user_id: currentUser.id, station_id: stationId },
+      { onConflict: 'user_id,station_id' }
+    );
+    if (error) throw error;
+  } catch(e) {
+    console.error('cloudAddVisited:', e);
+    syncToast('⚠ Sync échouée — sera réessayée', true);
+  }
 }
+
 async function cloudRemoveVisited(stationId) {
   if (!currentUser) return;
-  await supa.from('visited_stations').delete().eq('user_id', currentUser.id).eq('station_id', stationId);
+  try {
+    const { error } = await supa.from('visited_stations').delete()
+      .eq('user_id', currentUser.id).eq('station_id', stationId);
+    if (error) throw error;
+  } catch(e) {
+    console.error('cloudRemoveVisited:', e);
+    syncToast('⚠ Sync échouée — sera réessayée', true);
+  }
 }
+
 async function cloudAddStay(stationId, from, to) {
   if (!currentUser) return null;
-  const { data } = await supa.from('stays').insert({ user_id: currentUser.id, station_id: stationId, date_from: from, date_to: to||from }).select().single();
-  return data;
+  try {
+    const { data, error } = await supa.from('stays').insert({
+      user_id: currentUser.id, station_id: stationId,
+      date_from: from, date_to: to||from
+    }).select().single();
+    if (error) throw error;
+    return data;
+  } catch(e) {
+    console.error('cloudAddStay:', e);
+    syncToast('⚠ Séjour non sauvegardé', true);
+    return null;
+  }
 }
+
 async function cloudDelStay(stayDbId) {
   if (!currentUser) return;
-  await supa.from('stays').delete().eq('id', stayDbId);
+  try {
+    const { error } = await supa.from('stays').delete().eq('id', stayDbId);
+    if (error) throw error;
+  } catch(e) {
+    console.error('cloudDelStay:', e);
+    syncToast('⚠ Suppression non synchronisée', true);
+  }
 }
 
 // ════════════ TOGGLE ════════════
@@ -1447,9 +1607,9 @@ async function delStay(stationId, idx) {
 let map, markers={}, tileLayers={}, currentLayer='satellite';
 
 const TILE_DEFS={
-  topo:      {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',                                                                     maxZoom:17, filter:'brightness(0.78) saturate(0.6) hue-rotate(185deg)'},
+  topo:      {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',                                                                     maxZoom:17, filter:'brightness(0.78) saturate(0.7) contrast(1.05)'},
   satellite: {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',                        maxZoom:19, filter:'brightness(0.82) saturate(0.75) hue-rotate(5deg)'},
-  street:    {url:'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',                                                              maxZoom:20, filter:'brightness(0.65) saturate(0.5) hue-rotate(185deg)'},
+  street:    {url:'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',                                                              maxZoom:20, filter:'brightness(0.72) saturate(0.6) contrast(1.05)'},
   winter:    {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',                                                                   maxZoom:19, filter:'brightness(0.88) saturate(0.1) hue-rotate(200deg) contrast(1.08)'},
 };
 
@@ -1463,8 +1623,6 @@ function initMap(){
   applyTileFilter('satellite');
   document.getElementById('lb-satellite')?.classList.add('active');
   document.getElementById('lb-topo')?.classList.remove('active');
-  L.control.zoom({position:'bottomleft'}).addTo(map);
-
   STATIONS.forEach(s=>{
     const m=L.marker([s.lat,s.lon],{icon:mkIcon(visitedIds.has(s.id))})
       .bindPopup(mkMiniPopup(s),{closeButton:false,maxWidth:200})
@@ -1815,6 +1973,139 @@ function showPage(name){
   if(name==='map'){setTimeout(()=>map.invalidateSize(),60);renderRegionDropdown();}
   if(name==='add'){initFilters();renderList();}
   if(name==='list') renderDoneList();
+  if(name==='stats') renderStats();
+}
+
+// ════════════ STATS ════════════
+function renderStats() {
+  const visited = STATIONS.filter(s => visitedIds.has(s.id));
+  const total   = STATIONS.length;
+  const count   = visited.length;
+  const pct     = total > 0 ? ((count/total)*100).toFixed(1) : 0;
+
+  // Continents
+  const contMap = getContinents(visitedIds);
+  const contAll = [...new Set(Object.values(CONTINENT_MAP))];
+
+  // Avg altitude
+  const avgAlt = count > 0
+    ? Math.round(visited.reduce((s,v) => s + v.alt, 0) / count)
+    : 0;
+
+  // Countries
+  const countries = new Set(visited.map(s => s.region));
+
+  // Stat cards
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-card"><div class="sc-val">${count}</div><div class="sc-lbl">Stations</div></div>
+    <div class="stat-card"><div class="sc-val">${pct}%</div><div class="sc-lbl">Complété</div></div>
+    <div class="stat-card"><div class="sc-val">${contMap.size}</div><div class="sc-lbl">Continents</div></div>
+    <div class="stat-card"><div class="sc-val">${countries.size}</div><div class="sc-lbl">Régions</div></div>
+  `;
+
+  // Continents bar chart
+  const contCounts = {};
+  contAll.forEach(c => contCounts[c] = 0);
+  visited.forEach(s => {
+    const c = CONTINENT_MAP[s.region];
+    if (c) contCounts[c] = (contCounts[c]||0) + 1;
+  });
+  const maxCont = Math.max(1, ...Object.values(contCounts));
+  document.getElementById('chart-continents').innerHTML = Object.entries(contCounts)
+    .sort((a,b) => b[1]-a[1])
+    .filter(([,v]) => {
+      const totalInCont = STATIONS.filter(s => CONTINENT_MAP[s.region]===arguments[0]?.[0]).length;
+      return true;
+    })
+    .map(([c,n]) => {
+      const tot = STATIONS.filter(s => CONTINENT_MAP[s.region]===c).length;
+      return `<div class="bar-row">
+        <div class="bar-label">${c}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(n/Math.max(1,tot))*100}%"></div></div>
+        <div class="bar-count">${n}/${tot}</div>
+      </div>`;
+    }).join('');
+
+  // Top regions bar chart
+  const regCounts = {};
+  visited.forEach(s => regCounts[s.region] = (regCounts[s.region]||0) + 1);
+  const topRegs = Object.entries(regCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxReg  = Math.max(1, topRegs[0]?.[1]||1);
+  document.getElementById('chart-regions').innerHTML = topRegs.map(([r,n]) => `
+    <div class="bar-row">
+      <div class="bar-label">${r}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(n/maxReg)*100}%"></div></div>
+      <div class="bar-count">${n}</div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px">Aucune station visitée</div>';
+
+  // Altitude chart (buckets)
+  const buckets = [
+    {lbl:'< 1000m',  min:0,    max:999},
+    {lbl:'1000-1500m',min:1000, max:1499},
+    {lbl:'1500-2000m',min:1500, max:1999},
+    {lbl:'2000-2500m',min:2000, max:2499},
+    {lbl:'> 2500m',  min:2500, max:99999},
+  ];
+  const altMax = Math.max(1, ...buckets.map(b => visited.filter(s=>s.alt>=b.min&&s.alt<=b.max).length));
+  document.getElementById('chart-altitude').innerHTML = buckets.map(b => {
+    const n = visited.filter(s => s.alt >= b.min && s.alt <= b.max).length;
+    return `<div class="bar-row">
+      <div class="bar-label">${b.lbl}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(n/altMax)*100}%"></div></div>
+      <div class="bar-count">${n}</div>
+    </div>`;
+  }).join('');
+
+  // Share card
+  const username = currentUser?.email?.split('@')[0] || 'Anonyme';
+  document.getElementById('share-name').textContent = username;
+  document.getElementById('share-big').textContent  = count;
+  document.getElementById('share-continents').innerHTML = [...contMap].map(c =>
+    `<span class="share-continent-pill">${c}</span>`
+  ).join('');
+  // Show unlocked achievements icons
+  const unlockedAchs = ACHIEVEMENTS.filter(a => checkAchievement(a, visitedIds));
+  document.getElementById('share-achievements').innerHTML = unlockedAchs
+    .slice(-6).map(a => `<span class="share-ach" title="${a.name}">${a.icon}</span>`).join('');
+}
+
+function copyShareLink() {
+  const url = `${window.location.origin}?user=${currentUser?.email?.split('@')[0]||''}`;
+  navigator.clipboard.writeText(url).then(() => toast('🔗 Lien copié !')).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('🔗 Lien copié !');
+  });
+}
+
+function downloadShareCard() {
+  const card = document.getElementById('share-card');
+  // Simple approach: open print dialog focused on card
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <style>
+      body{margin:0;background:#0d1117;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:sans-serif;}
+      .card{background:linear-gradient(135deg,#0d1117,#141b24,#1c2534);border:1px solid #354a62;border-radius:20px;padding:32px 40px;text-align:center;width:320px;}
+      .logo{font-size:16px;color:#4d6478;margin-bottom:16px;font-style:italic;}
+      .logo em{color:#5ba3d0;font-style:normal;}
+      .name{font-size:13px;color:#9ab0c4;margin-bottom:10px;}
+      .big{font-size:64px;color:#f0f6ff;line-height:1;font-style:italic;}
+      .lbl{font-size:11px;color:#4d6478;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;}
+      .pills{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:14px;}
+      .pill{font-size:10px;padding:3px 10px;border-radius:100px;background:rgba(91,163,208,.12);border:1px solid rgba(91,163,208,.2);color:#89c4e8;}
+      .achs{font-size:22px;margin-bottom:18px;}
+      .footer{font-size:9px;color:#4d6478;letter-spacing:1px;text-transform:uppercase;}
+    </style></head><body><div class="card">
+    ${card.innerHTML.replace(/class="share-logo"/,'class="logo"').replace(/class="share-name"/,'class="name"')
+      .replace(/class="share-big"/,'class="big"').replace(/class="share-label"/,'class="lbl"')
+      .replace(/class="share-continents"/,'class="pills"').replace(/class="share-continent-pill"/g,'class="pill"')
+      .replace(/class="share-achievements"/,'class="achs"').replace(/class="share-footer"/,'class="footer"')}
+    </div></body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
 }
 
 // ════════════ MENUS ════════════
@@ -1858,6 +2149,18 @@ window.addEventListener('DOMContentLoaded', async () => {
       await onSignIn(session.user);
     }
   });
+  // Offline/online detection
+  const offlineBanner = document.getElementById('offline-banner');
+  window.addEventListener('offline', () => offlineBanner?.classList.add('show'));
+  window.addEventListener('online',  () => offlineBanner?.classList.remove('show'));
+  if (!navigator.onLine) offlineBanner?.classList.add('show');
+
+  // Register Service Worker for offline support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registered:', reg.scope);
+    }).catch(err => console.log('SW error:', err));
+  }
 });
 </script>
 </body>
