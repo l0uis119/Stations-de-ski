@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root {
   --bg:       #1a1410;
@@ -858,7 +858,7 @@ const REGION_BOUNDS={
   'États-Unis':   [[36.5,-122.0],[51.0,-105.0]],
   'Norvège':      [[59.5,7.5],[62.5,13.5]],
   'Suède':        [[61.0,12.5],[64.0,15.0]],
-  'Nouvelle-Zélande':[[−45.5,167.5],[−44.5,170.0]],
+  'Nouvelle-Zélande':[[-45.5,167.5],[-44.5,170.0]],
   'Chili':        [[-35.0,-71.0],[-32.5,-69.5]],
   'Argentine':    [[-36.0,-71.0],[-34.5,-69.5]],
   'Géorgie':      [[41.5,43.0],[43.0,45.0]],
@@ -870,7 +870,12 @@ const REGION_BOUNDS={
 // ════════════ SUPABASE ════════════
 const SUPA_URL = 'https://xavrkighbeverdusuqlj.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhdnJraWdoYmV2ZXJkdXN1cWxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MjcxNTgsImV4cCI6MjA4ODIwMzE1OH0.mzTkkKtbi015K-H6z6XEP2H_T4en6KBKj9dckLcRBvE';
-const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+let supa;
+try {
+  supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+} catch(e) {
+  console.error('Supabase failed to load:', e);
+}
 
 let currentUser = null;
 let authTab = 'login';
@@ -901,6 +906,8 @@ async function authSubmit() {
   const btn   = document.getElementById('auth-submit-btn');
 
   errEl.textContent = ''; okEl.textContent = '';
+
+  if (!supa) { errEl.textContent = 'Erreur de chargement — recharge la page.'; return; }
   if (!email || !pw) { errEl.textContent = 'Remplis tous les champs.'; return; }
   if (authTab==='signup' && pw.length < 8) { errEl.textContent = 'Mot de passe trop court (8 caractères min.).'; return; }
   if (authTab==='signup' && pw !== pw2) { errEl.textContent = 'Les mots de passe ne correspondent pas.'; return; }
