@@ -210,7 +210,16 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px
 .empty-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:6px;}
 .empty-sub{font-size:13px;}
 
-/* Toast */
+/* ─── ACHIEVEMENTS ─── */
+.achievements-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.achievement{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 13px;transition:all .3s;}
+.achievement.unlocked{border-color:var(--gold);background:rgba(212,168,67,.07);}
+.ach-icon{font-size:20px;filter:grayscale(1);opacity:.35;transition:all .3s;}
+.achievement.unlocked .ach-icon{filter:none;opacity:1;}
+.ach-text{display:flex;flex-direction:column;}
+.ach-name{font-size:12px;font-weight:500;color:var(--muted);}
+.achievement.unlocked .ach-name{color:var(--gold);}
+.ach-desc{font-size:10px;color:var(--muted);margin-top:1px;}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:8px 18px;font-size:12px;color:var(--text);opacity:0;transition:all .28s;z-index:9999;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
@@ -378,6 +387,7 @@ mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
   <div class="list-inner">
     <div class="page-title">Mes stations</div>
     <div class="page-sub" id="list-sub">—</div>
+    <div class="achievements-row" id="achievements-row"></div>
     <div id="done-list"></div>
   </div>
 </div>
@@ -787,6 +797,46 @@ const STATIONS = [
  open:"Nov", created:1961, domain:"500 ha de pistes", anecdote:"Capitale mondiale du ski extrême — les couloirs de Crested Butte comme the Headwall, Spellbound Bowl et les faces nord impossibles ont construit une réputation mondiale parmi les skieurs les plus engagés. La ville de Crested Butte, classée National Historic District, est un des derniers vrais villages miniers victoriens intacts du Colorado."},
 {id:419,name:"Snowmass",          region:"États-Unis", massif:"Colorado Rockies", alt:3813, lat:39.21, lon:-106.94,
  open:"Nov", created:1967, domain:"800 ha de pistes", anecdote:"Village-station construit ex nihilo à 8km d'Aspen. Le dénivelé vertical de Snowmass (1417m) est le plus grand du Colorado — l'une des grandes descentes d'Amérique. La Elk Camp Gondola dessert un plateau panoramique avec vue sur les Elk Mountains. Base très familiale contrastant avec le glamour d'Aspen toute proche."},
+// ── NORVÈGE ────────────────────────────────────────────
+{id:500,name:"Hemsedal",          region:"Norvège", massif:"Hallingdal", alt:1450, lat:60.86, lon:8.56,
+ open:"Nov", created:1967, domain:"52 km de pistes", anecdote:"Surnommée 'les Alpes scandinaves' — Hemsedal est la station norvégienne avec le plus grand dénivelé et la neige la plus sèche du pays. Prisée des Norvégiens et des Suédois qui viennent chercher la poudreuse froide de décembre. Les aurores boréales illuminent parfois les pistes en soirée — spectacle unique au monde."},
+{id:501,name:"Trysil",            region:"Norvège", massif:"Hedmark", alt:1132, lat:61.33, lon:12.27,
+ open:"Nov", created:1966, domain:"70 km de pistes", anecdote:"La plus grande station de Norvège en termes de pistes. Trysil est très familiale, réputée pour ses larges pistes damées et son infrastructure impeccable. À la frontière suédoise, dans une forêt de conifères dense qui protège les pistes du vent. Les Norvégiens y passent leurs vacances scolaires d'hiver depuis des générations."},
+{id:502,name:"Geilo",             region:"Norvège", massif:"Hardangervidda", alt:1178, lat:60.53, lon:8.20,
+ open:"Nov", created:1956, domain:"35 km de pistes", anecdote:"Sur le plateau de Hardangervidda, le plus grand plateau montagneux d'Europe du Nord. Geilo est l'une des rares stations au monde où l'on peut skier alpin ET traverser le plateau en ski de fond sur 100 km. Les vents sibériens y apportent une neige exceptionnellement sèche et légère."},
+// ── SUÈDE ──────────────────────────────────────────────
+{id:510,name:"Åre",               region:"Suède", massif:"Jämtland", alt:1420, lat:63.40, lon:13.08,
+ open:"Nov", created:1954, domain:"100 km de pistes", anecdote:"La plus grande station scandinave et l'une des meilleures d'Europe du Nord. Åre a accueilli les Championnats du Monde 2019 — la descente se disputait sur une piste tracée à flanc de montagne avec vue sur le lac Åresjön gelé. Le village médiéval en bois coloré est classé patrimoine national suédois."},
+{id:511,name:"Sälen",             region:"Suède", massif:"Dalarna", alt:900, lat:61.16, lon:13.27,
+ open:"Nov", created:1967, domain:"100 km de pistes (4 stations)", anecdote:"La station familiale la plus fréquentée de Suède. Sälen regroupe 4 domaines reliés dans la forêt de Dalarna. Chaque année en mars, Sälen est le départ de la Vasaloppet — la plus grande course de ski de fond du monde avec 15 000 participants sur 90 km jusqu'à Mora."},
+// ── NOUVELLE-ZÉLANDE ───────────────────────────────────
+{id:520,name:"Queenstown (Remarkables)", region:"Nouvelle-Zélande", massif:"Otago", alt:1943, lat:-45.07, lon:168.83,
+ open:"Juin", created:1985, domain:"60 km de pistes", anecdote:"Ski en juillet sous un soleil de l'hémisphère sud avec vue sur le lac Wakatipu turquoise — un décor absolument irréel. Les Remarkables, chaîne de montagnes aux arêtes tranchantes, dominent Queenstown depuis 2200m. Après le ski, les bungee-jumps et parachutes de la capitale mondiale de l'adrénaline t'attendent."},
+{id:521,name:"Wanaka (Cardrona)",  region:"Nouvelle-Zélande", massif:"Otago", alt:1860, lat:-44.87, lon:169.18,
+ open:"Juin", created:1967, domain:"40 km de pistes", anecdote:"Station familiale sur un plateau alpin unique en Nouvelle-Zélande — paysages ouverts et venteux très différents des Alpes. Le col de Cardrona est historique : les chercheurs d'or du 19ème siècle le franchissaient à pied pour rejoindre les gisements d'Otago. La neige australe tombe de juin à octobre."},
+// ── CHILI ──────────────────────────────────────────────
+{id:530,name:"Valle Nevado",       region:"Chili", massif:"Andes chiliennes", alt:3670, lat:-33.36, lon:-70.29,
+ open:"Juin", created:1988, domain:"35 km de pistes", anecdote:"À 3000m d'altitude dans les Andes, à seulement 60km de Santiago — on peut skier le matin et dîner au bord de l'océan Pacifique le soir. La neige andine est extrêmement sèche et poudreuse grâce à l'altitude et le climat désertique de la Cordillère. Vue directe sur l'Aconcagua (6961m) par temps clair."},
+{id:531,name:"Portillo",           region:"Chili", massif:"Andes chiliennes", alt:3310, lat:-32.84, lon:-70.13,
+ open:"Juin", created:1949, domain:"35 km de pistes", anecdote:"La plus ancienne station d'Amérique du Sud et l'une des plus mythiques au monde. Portillo est un resort isolé — un seul hôtel, 450 personnes maximum, pas de village. Les équipes nationales du monde entier viennent s'y entraîner en juillet-août quand l'hémisphère nord est en été. La piste Roca Jack, à 60°, est l'une des plus raides du monde."},
+// ── ARGENTINE ──────────────────────────────────────────
+{id:540,name:"Las Leñas",          region:"Argentine", massif:"Andes argentines", alt:3430, lat:-35.16, lon:-70.07,
+ open:"Juin", created:1983, domain:"65 km de pistes", anecdote:"La station la plus haute d'Argentine et l'une des meilleures poudreuses du monde — jusqu'à 12m de neige par saison dans les Andes mendocines. Las Leñas est le terrain de jeu des skieurs pro hors-saison : Warren Miller y a filmé des séquences légendaires. L'isolement total (6h de Buenos Aires) garantit des pistes vierges."},
+// ── GÉORGIE ────────────────────────────────────────────
+{id:550,name:"Gudauri",            region:"Géorgie", massif:"Grand Caucase", alt:3279, lat:42.47, lon:44.49,
+ open:"Déc", created:1988, domain:"57 km de pistes", anecdote:"La destination ski la plus tendance des Balkans et du Caucase. Gudauri est perché à 2200m sur le versant sud du Grand Caucase, à 120km de Tbilissi. La neige sèche caucasienne est réputée légère et abondante. Le téléphérique qui monte jusqu'à 3279m offre un panorama spectaculaire sur les sommets géorgiens et arméniens."},
+// ── GÉORGIE ────────────────────────────────────────────
+{id:551,name:"Bakuriani",          region:"Géorgie", massif:"Petit Caucase", alt:2950, lat:41.74, lon:43.52,
+ open:"Déc", created:1935, domain:"25 km de pistes", anecdote:"Fondée à l'époque soviétique en 1935 comme station de villégiature pour l'élite de Moscou. Le petit train à crémaillère 'Kukushka' (La Coucou) qui monte depuis Borjomi depuis 1902 est toujours en service. Village de charme avec ses datchas soviétiques en bois coloré, uniques dans le paysage caucasien."},
+// ── MAROC ──────────────────────────────────────────────
+{id:560,name:"Oukaimeden",         region:"Maroc", massif:"Haut Atlas", alt:3268, lat:31.21, lon:-7.86,
+ open:"Jan", created:1930, domain:"20 km de pistes", anecdote:"La station de ski la plus au sud du monde accessible facilement — à seulement 74km de Marrakech. On peut skier le matin sur les pentes enneigées du Haut Atlas et prendre le thé à la menthe dans les souks de Marrakech le soir. La neige y tombe de janvier à mars, parfois sur fond de coucher de soleil sur le Sahara."},
+// ── IRAN ───────────────────────────────────────────────
+{id:570,name:"Dizin",              region:"Iran", massif:"Alborz", alt:3600, lat:36.08, lon:51.40,
+ open:"Déc", created:1969, domain:"45 km de pistes", anecdote:"La plus haute station du Moyen-Orient à 3600m dans les monts Alborz. Dizin surprend chaque visiteur : une vraie station alpine avec téléphériques, pistes noires et neige poudreuse, à seulement 2h de Téhéran. La neige y est exceptionnellement légère et sèche grâce à l'air continental de la steppe iranienne."},
+// ── KAZAKHSTAN ─────────────────────────────────────────
+{id:580,name:"Shymbulak",          region:"Kazakhstan", massif:"Tian Shan", alt:3200, lat:43.14, lon:77.08,
+ open:"Nov", created:1954, domain:"20 km de pistes", anecdote:"À 25km d'Almaty, la plus grande ville du Kazakhstan, Shymbulak est nichée dans un cirque naturel des monts Tian Shan. Construite à l'époque soviétique pour les athlètes d'élite, elle accueille aujourd'hui une clientèle kazakhe aisée. La neige des Tian Shan — 'les Montagnes Célestes' en turcique — est réputée pour sa légèreté exceptionnelle."},
 ];
 
 // ════════════════════════════════════════════════════════
@@ -805,6 +855,15 @@ const REGION_BOUNDS={
   'Andorre':      [[42.4,1.4],[42.7,1.9]],
   'Japon':        [[36.0,130.0],[44.5,145.5]],
   'États-Unis':   [[36.5,-122.0],[51.0,-105.0]],
+  'Norvège':      [[59.5,7.5],[62.5,13.5]],
+  'Suède':        [[61.0,12.5],[64.0,15.0]],
+  'Nouvelle-Zélande':[[−45.5,167.5],[−44.5,170.0]],
+  'Chili':        [[-35.0,-71.0],[-32.5,-69.5]],
+  'Argentine':    [[-36.0,-71.0],[-34.5,-69.5]],
+  'Géorgie':      [[41.5,43.0],[43.0,45.0]],
+  'Maroc':        [[30.8,-8.2],[31.6,-7.4]],
+  'Iran':         [[35.7,51.0],[36.5,52.0]],
+  'Kazakhstan':   [[42.8,76.5],[43.5,77.5]],
 };
 
 // ════════════ SUPABASE ════════════
@@ -988,7 +1047,7 @@ async function delStay(stationId, idx) {
 }
 
 // ════════════ MAP ════════════
-let map, markers={}, tileLayers={}, currentLayer='topo';
+let map, markers={}, tileLayers={}, currentLayer='satellite';
 
 const TILE_DEFS={
   topo:      {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',                                                                     maxZoom:17, filter:'brightness(0.82) saturate(0.75) sepia(0.12)'},
@@ -1002,8 +1061,10 @@ function initMap(){
   Object.entries(TILE_DEFS).forEach(([key,def])=>{
     tileLayers[key]=L.tileLayer(def.url,{maxZoom:def.maxZoom||19,minZoom:2,maxNativeZoom:def.maxZoom||19});
   });
-  tileLayers['topo'].addTo(map);
-  applyTileFilter('topo');
+  tileLayers['satellite'].addTo(map);
+  applyTileFilter('satellite');
+  document.getElementById('lb-satellite')?.classList.add('active');
+  document.getElementById('lb-topo')?.classList.remove('active');
   L.control.zoom({position:'bottomleft'}).addTo(map);
 
   STATIONS.forEach(s=>{
@@ -1202,10 +1263,42 @@ function initFilters(){
   mk('Tout','all');REGIONS.forEach(r=>mk(r,r));
 }
 
+// ════════════ ACHIEVEMENTS ════════════
+const ACHIEVEMENTS = [
+  {n:1,   icon:'🎿', name:'Premier départ',    desc:'Ta première station !'},
+  {n:5,   icon:'⛷️', name:'En jambes',         desc:'5 stations visitées'},
+  {n:10,  icon:'🏔️', name:'Montagnard',        desc:'10 stations visitées'},
+  {n:20,  icon:'❄️', name:'Chasseur de neige', desc:'20 stations visitées'},
+  {n:30,  icon:'🦅', name:'Aigle des cimes',   desc:'30 stations visitées'},
+  {n:50,  icon:'🔥', name:'Piste rouge',       desc:'50 stations visitées'},
+  {n:75,  icon:'💎', name:'Diamant noir',      desc:'75 stations visitées'},
+  {n:100, icon:'🏆', name:'Légende des pistes',desc:'100 stations visitées'},
+  {n:150, icon:'🌍', name:'Globe-trotter',     desc:'150 stations visitées'},
+  {n:193, icon:'👑', name:'PeakDone',          desc:'Toutes les stations !'},
+];
+
+function renderAchievements(count) {
+  const row = document.getElementById('achievements-row');
+  if (!row) return;
+  row.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = count >= a.n;
+    const div = document.createElement('div');
+    div.className = 'achievement' + (unlocked ? ' unlocked' : '');
+    div.innerHTML = `<div class="ach-icon">${a.icon}</div>
+      <div class="ach-text">
+        <div class="ach-name">${a.name}</div>
+        <div class="ach-desc">${unlocked ? '✓ ' : ''}${a.desc}</div>
+      </div>`;
+    row.appendChild(div);
+  });
+}
+
 // ════════════ DONE LIST ════════════
 function renderDoneList(){
   const visited=STATIONS.filter(s=>visitedIds.has(s.id));
   document.getElementById('list-sub').textContent=`${visited.length} station${visited.length>1?'s':''} visitée${visited.length>1?'s':''}`;
+  renderAchievements(visited.length);
   const el=document.getElementById('done-list');
   if(!visited.length){el.innerHTML=`<div class="empty"><div class="empty-icon">⛷️</div><div class="empty-title">Aucune station encore</div><div class="empty-sub">Va dans "Ajouter" pour commencer</div></div>`;return;}
   const byR={};visited.forEach(s=>{(byR[s.region]=byR[s.region]||[]).push(s);});
