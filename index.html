@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ski.been</title>
+<title>PeakDone</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg:       #1a1410;
@@ -215,17 +216,61 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px
 
 mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
 
-/* Leaflet zoom */
-.leaflet-control-zoom a{background:var(--surface) !important;color:var(--text2) !important;border-color:var(--border) !important;}
-.leaflet-control-zoom a:hover{background:var(--surface2) !important;color:var(--accent) !important;}
+/* ─── AUTH MODAL ─── */
+.auth-overlay{position:fixed;inset:0;background:rgba(15,11,8,.85);backdrop-filter:blur(6px);z-index:9000;display:flex;align-items:center;justify-content:center;}
+.auth-overlay.hidden{display:none;}
+.auth-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 28px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:20px;}
+.auth-logo{font-family:'Playfair Display',serif;font-style:italic;font-size:26px;color:var(--snow);text-align:center;}
+.auth-logo em{color:var(--accent);font-style:normal;}
+.auth-title{font-size:14px;color:var(--muted);text-align:center;margin-top:-10px;}
+.auth-tabs{display:flex;background:var(--surface2);border-radius:9px;padding:3px;gap:3px;}
+.auth-tab{flex:1;padding:8px;border:none;border-radius:7px;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+.auth-tab.active{background:var(--surface3);color:var(--text);}
+.auth-fields{display:flex;flex-direction:column;gap:10px;}
+.auth-input{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;}
+.auth-input::placeholder{color:var(--muted);}
+.auth-input:focus{border-color:var(--accent);}
+.auth-btn{padding:12px;border-radius:9px;border:none;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;}
+.auth-btn:hover{background:var(--accent2);}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+.auth-err{font-size:12px;color:#f87171;text-align:center;min-height:16px;}
+.auth-ok{font-size:12px;color:#86efac;text-align:center;min-height:16px;}
+
+/* ─── USER PILL in nav ─── */
+.user-pill{font-size:11px;color:var(--muted);cursor:pointer;padding:4px 10px;border:1px solid var(--border);border-radius:100px;background:var(--surface);transition:all .2s;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.user-pill:hover{border-color:var(--accent);color:var(--accent);}
+.sync-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:4px;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
 </style>
 </head>
 <body>
 
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">Peak<em>Done</em></div>
+    <div class="auth-title">Suis tes stations sur tous tes appareils</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
+    </div>
+    <div class="auth-fields">
+      <input class="auth-input" id="auth-email" type="email" placeholder="Adresse email" autocomplete="email">
+      <input class="auth-input" id="auth-pw" type="password" placeholder="Mot de passe (8 caractères min.)" autocomplete="current-password">
+      <input class="auth-input" id="auth-pw2" type="password" placeholder="Confirmer le mot de passe" style="display:none">
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-ok" id="auth-ok"></div>
+    <button class="auth-btn" id="auth-submit-btn" onclick="authSubmit()">Se connecter</button>
+  </div>
+</div>
+
 <nav>
-  <div class="logo">ski<em>.</em>been</div>
+  <div class="logo">Peak<em>Done</em></div>
   <div class="nav-right">
     <div class="stats-pill" id="stats-pill"><strong>0</strong> station</div>
+    <div class="user-pill" id="user-pill" onclick="signOut()" title="Cliquer pour se déconnecter"></div>
     <div class="icon-btn" id="burger" onclick="toggleMenu()">
       <div class="burger-lines"><span></span><span></span><span></span></div>
     </div>
@@ -678,6 +723,70 @@ const STATIONS = [
  open:"Déc", created:1957, domain:"210 km de pistes", anecdote:"Le plus grand domaine skiable des Pyrénées. L'Andorre est une co-principauté indépendante gouvernée conjointement par le Président français et l'Évêque d'Urgell — structure médiévale unique. Shopping hors-taxes attire autant que les pistes."},
 {id:228,name:"Vallnord-Pal Arinsal", region:"Andorre", massif:"Andorre", alt:2625, lat:42.58, lon:1.47,
  open:"Déc", created:1960, domain:"65 km de pistes", anecdote:"Vue sur les Pyrénées catalanes et la plaine de la Seu d'Urgell. Pal est plus familial, Arinsal plus orienté jeunes et après-ski animé. L'Andorre, avec ses 468 km², est l'un des plus petits États d'Europe mais possède un des meilleurs rapports neige/accessibilité des Pyrénées."},
+// ── JAPON ──────────────────────────────────────────────
+{id:300,name:"Niseko",            region:"Japon", massif:"Hokkaido", alt:1308, lat:42.80, lon:140.69,
+ open:"Nov", created:1972, domain:"48 km de pistes (4 stations liées)", anecdote:"La Mecque mondiale du ski de poudreuse — Niseko reçoit en moyenne 15 mètres de neige par saison, parmi les plus hautes précipitations neigeuses de la planète. La neige japonaise (Japow) est légendaire : ultra-sèche et légère, elle tombe en quantité sidérante de décembre à mars. Les Australiens ont 'découvert' Niseko dans les années 2000, transformant ce paisible village hokkaïdien en destination internationale. Le Mont Yōtei, volcan parfait visible depuis les pistes, est surnommé le 'Fuji de Hokkaido'."},
+{id:301,name:"Furano",            region:"Japon", massif:"Hokkaido", alt:1209, lat:43.35, lon:142.38,
+ open:"Nov", created:1962, domain:"30 km de pistes", anecdote:"Furano est la station préférée des Japonais — moins internationale que Niseko, plus authentique. Connue pour ses champs de lavande spectaculaires en été. La neige y est réputée encore plus sèche et légère qu'à Niseko. Accueille régulièrement des épreuves de Coupe du Monde de ski alpin sur ses pentes exigeantes."},
+{id:302,name:"Rusutsu",           region:"Japon", massif:"Hokkaido", alt:994, lat:42.74, lon:140.89,
+ open:"Nov", created:1966, domain:"42 km de pistes", anecdote:"Station familiale avec un resort hôtelier gigantesque abritant même un parc d'attractions intérieur. La neige poudreuse y est extraordinaire — souvent la première option des familles australiennes après Niseko. Les zones de forêt hors-piste (tree runs) entre les épicéas sont absolument magiques après les chutes."},
+{id:303,name:"Hakuba",            region:"Japon", massif:"Alpes japonaises", alt:2696, lat:36.70, lon:137.86,
+ open:"Nov", created:1956, domain:"200 km de pistes (11 stations)", anecdote:"Site des JO de Nagano 1998 — les descentes et sauts à ski se disputèrent ici. La vallée de Hakuba regroupe 11 stations distinctes sur 200 km. Située dans les Alpes japonaises de Honshu, la neige est plus humide qu'Hokkaido mais les dénivelés y sont plus impressionnants. Le village conserve son caractère japonais traditionnel malgré l'afflux de visiteurs étrangers."},
+{id:304,name:"Nozawa Onsen",      region:"Japon", massif:"Alpes japonaises", alt:1650, lat:36.92, lon:138.45,
+ open:"Déc", created:1912, domain:"35 km de pistes", anecdote:"L'une des plus anciennes stations du Japon — les sources chaudes (onsen) en plein village sont gratuites et accessibles à tous depuis des siècles. Les canaux d'eau chaude naturelle chauffent les ruelles du village pour éviter le verglas. La fête du Feu de Dosojin, chaque 15 janvier, est une célébration shinto millénaire classée patrimoine culturel national."},
+{id:305,name:"Myoko Kogen",       region:"Japon", massif:"Alpes japonaises", alt:1855, lat:36.87, lon:138.11,
+ open:"Déc", created:1931, domain:"70 km de pistes (6 stations)", anecdote:"L'une des zones les plus enneigées du Japon continental — jusqu'à 12 mètres de neige par an. Plusieurs petites stations authentiques avec sources chaudes et ryokans traditionnels. Les flux d'air humide de la mer du Japon déversent ici des quantités phénoménales de neige légère chaque hiver."},
+{id:306,name:"Shiga Kogen",       region:"Japon", massif:"Alpes japonaises", alt:2307, lat:36.73, lon:138.52,
+ open:"Déc", created:1936, domain:"80 km de pistes (19 stations liées)", anecdote:"Le plus grand domaine skiable du Japon — 19 stations reliées sur un vaste plateau. Site des épreuves de ski alpin des JO de Nagano 1998. Altitude et exposition nord garantissent une neige de qualité exceptionnelle jusqu'en mai. Les macaques japonais se réchauffent dans les sources chaudes à quelques kilomètres des pistes."},
+{id:307,name:"Zao Onsen",         region:"Japon", massif:"Tohoku", alt:1841, lat:38.14, lon:140.44,
+ open:"Déc", created:1924, domain:"40 km de pistes", anecdote:"Célèbre pour ses 'monstres de neige' (juhyo) — des sapins entièrement enveloppés de glace et de neige qui prennent des formes fantomatiques et sculpturales absolument uniques au monde. Le phénomène est dû aux brumes glacées du volcan Zao combinées aux vents. Un spectacle absolument irréel, souvent éclairé de nuit."},
+{id:308,name:"Kiroro",            region:"Japon", massif:"Hokkaido", alt:1180, lat:43.12, lon:141.00,
+ open:"Nov", created:1972, domain:"34 km de pistes", anecdote:"Nichée dans une vallée secrète d'Hokkaido, Kiroro est la station qui reçoit le plus de neige au Japon après Niseko. Peu fréquentée par les étrangers, elle est le refuge des puristes de la poudreuse japonaise. Les forêts de bouleaux et d'épicéas givrés créent un décor de conte d'hiver nordique absolument envoûtant."},
+{id:309,name:"Tomamu",            region:"Japon", massif:"Hokkaido", alt:1239, lat:43.02, lon:142.79,
+ open:"Nov", created:1984, domain:"28 km de pistes", anecdote:"Station connue pour sa 'mer de nuages' — un phénomène météorologique où les nuages s'accumulent dans la vallée à l'aube, créant un lac de brume illuminé par le soleil levant. Un restaurant spécial 'Cloud Walk' permet de prendre le petit-déjeuner au-dessus des nuages. La neige y est parmi les plus fines de tout Hokkaido."},
+{id:310,name:"Appi Kogen",        region:"Japon", massif:"Tohoku", alt:1308, lat:39.98, lon:140.96,
+ open:"Déc", created:1987, domain:"21 km de pistes", anecdote:"Station resort de luxe dans les montagnes d'Iwate. Loin des circuits touristiques habituels, Appi offre une expérience authentiquement japonaise avec ses hôtels traditionnels et ses sources thermales privées. La neige y est abondante et légère grâce aux influences sibériennes soufflant de la mer du Japon."},
+// ── ÉTATS-UNIS ─────────────────────────────────────────
+{id:400,name:"Vail",              region:"États-Unis", massif:"Colorado Rockies", alt:3527, lat:39.64, lon:-106.37,
+ open:"Nov", created:1962, domain:"2050 ha de pistes", anecdote:"La plus grande station des États-Unis et l'une des plus grandes du monde. Le Back Bowls de Vail — 7 cuvettes hors-piste géantes dans la montagne — représentent à eux seuls plus de terrain que beaucoup de stations européennes entières. Fondée en 1962 par Pete Seibert, vétéran de la 10ème Division de Montagne qui a combattu dans les Apennins italiens."},
+{id:401,name:"Aspen",             region:"États-Unis", massif:"Colorado Rockies", alt:3813, lat:39.19, lon:-106.82,
+ open:"Nov", created:1947, domain:"500 ha (4 montagnes)", anecdote:"La station la plus célèbre et la plus chic du monde — Hunter S. Thompson y vivait, Jack Nicholson y possède un chalet, les célébrités d'Hollywood envahissent la ville chaque hiver. Aspen possède quatre montagnes distinctes dont le légendaire Ajax Mountain avec ses noires intimidantes. La ville d'Aspen elle-même, victorienne et dorée, est un musée vivant de l'ère minière du Colorado."},
+{id:402,name:"Telluride",         region:"États-Unis", massif:"Colorado Rockies", alt:4114, lat:37.94, lon:-107.85,
+ open:"Nov", created:1972, domain:"126 km de pistes", anecdote:"Enclavé dans un canyon spectaculaire à 2660m d'altitude, accessible autrefois uniquement par avion ou route de montagne. La ville de Telluride, fondée pendant la ruée vers l'or, possède le plus grand nombre de bâtiments classés par habitant des États-Unis. Les pistes de Revelation Bowl, à 4115m, offrent un des plus beaux panoramas de toutes les Rocheuses."},
+{id:403,name:"Park City",         region:"États-Unis", massif:"Utah Wasatch", alt:3048, lat:40.65, lon:-111.50,
+ open:"Nov", created:1963, domain:"3240 ha (après fusion PCMR-Canyons)", anecdote:"Le plus grand domaine skiable des États-Unis depuis la fusion avec Canyons Resort. Station des JO de Salt Lake City 2002 — les épreuves de slalom et snowboard s'y sont déroulées. L'Utah Powder — neige sèche et légère grâce au Grand Lac Salé qui crée un effet de lac-effet de neige unique — est réputé comme le meilleur ski alpin des USA."},
+{id:404,name:"Alta",              region:"États-Unis", massif:"Utah Wasatch", alt:3216, lat:40.59, lon:-111.64,
+ open:"Nov", created:1939, domain:"500 ha de pistes", anecdote:"La station la plus ancienne de l'Utah, fondée en 1939. Alta est l'une des trois dernières stations au monde à interdire les snowboards — règle maintenue farouchement depuis les années 80 malgré plusieurs batailles juridiques. La neige d'Alta est réputée être la meilleure du monde : légère, sèche, abondante — jusqu'à 14 mètres par saison."},
+{id:405,name:"Snowbird",          region:"États-Unis", massif:"Utah Wasatch", alt:3352, lat:40.58, lon:-111.66,
+ open:"Nov", created:1971, domain:"400 ha de pistes", anecdote:"Voisine d'Alta, reliée depuis 2014. Snowbird est connue pour être la station la plus difficile des États-Unis — 27% de pistes noires et une grande partie de terrain expert. Le tram aérien Snowbird, en service depuis 1971, monte 125 personnes en 8 minutes au Hidden Peak (3352m) — icône absolue du ski américain."},
+{id:406,name:"Jackson Hole",      region:"États-Unis", massif:"Wyoming Tetons", alt:3185, lat:43.59, lon:-110.83,
+ open:"Nov", created:1965, domain:"1011 ha de pistes", anecdote:"La montagne la plus intimidante des États-Unis — 50% de terrain expert et la légendaire Corbet's Couloir, un couloir dont l'entrée nécessite un saut dans le vide de 3 à 6 mètres suivi d'une pente à 50°. Le parc national de Grand Teton voisin offre un panorama de cathédrale rocheuse absolument incomparable. Les wapitis et bisons paissent en contrebas."},
+{id:407,name:"Sun Valley",        region:"États-Unis", massif:"Idaho Sawtooth", alt:2798, lat:43.70, lon:-114.35,
+ open:"Nov", created:1936, domain:"800 ha de pistes", anecdote:"Première station de ski construite aux États-Unis en 1936, commandée par le patron de l'Union Pacific Railroad pour attirer les riches voyageurs vers l'Idaho. Ernest Hemingway y a vécu et y est mort en 1961 — sa maison est toujours debout. Inventeur du télésiège — avant Sun Valley, les skieurs montaient dans des bennes à bananes sur rails."},
+{id:408,name:"Mammoth Mountain",  region:"États-Unis", massif:"California Sierra Nevada", alt:3369, lat:37.63, lon:-119.03,
+ open:"Nov", created:1955, domain:"1500 ha de pistes", anecdote:"La station californienne par excellence — Los Angelenos font 5h de route pour venir ici chaque week-end d'hiver. Mammoth est un volcan endormi (dernière éruption il y a 57 000 ans) avec de la vapeur qui sort encore du sol à certains endroits. La saison peut durer jusqu'en août certaines années grâce à l'altitude et l'orientation nord."},
+{id:409,name:"Whistler Blackcomb", region:"États-Unis", massif:"British Columbia Coast", alt:2182, lat:50.12, lon:-122.95,
+ open:"Nov", created:1966, domain:"3307 ha de pistes", anecdote:"Le plus grand domaine d'Amérique du Nord combiné. Techniquement au Canada (Colombie-Britannique), mais intégré dans tous les pass américains. Site des JO de Vancouver 2010. Le Peak 2 Peak Gondola, inauguré en 2008, détient plusieurs records mondiaux — 4,4 km de câble, 436m au-dessus de la vallée, deux cabines en verre transparent pour voir le vide."},
+{id:410,name:"Steamboat Springs", region:"États-Unis", massif:"Colorado Rockies", alt:3221, lat:40.49, lon:-106.80,
+ open:"Nov", created:1963, domain:"880 ha de pistes", anecdote:"Capital mondiale du ski champagne — le 'Champagne Powder' de Steamboat est une marque déposée depuis 1914. La neige y est si légère et sèche qu'elle ressemble à de la poudre à canon. Steamboat a produit plus d'olympiens en ski de fond que n'importe quelle autre ville américaine. Les cow-boys locaux skient encore avec leurs éperons."},
+{id:411,name:"Stowe",             region:"États-Unis", massif:"Vermont Green Mountains", alt:1339, lat:44.53, lon:-72.78,
+ open:"Nov", created:1937, domain:"485 ha de pistes", anecdote:"La 'reine des stations de l'Est' — Stowe est la station la plus mythique de la côte Est américaine. La famille von Trapp (oui, La Mélodie du Bonheur) a fui l'Autriche nazie en 1938 et a ouvert une auberge ici en 1950, toujours en activité. Le Mt. Mansfield (1339m), point culminant du Vermont, offre une vue jusqu'au Canada par temps clair."},
+{id:412,name:"Lake Tahoe (Palisades)", region:"États-Unis", massif:"California/Nevada Sierra Nevada", alt:2761, lat:39.20, lon:-120.24,
+ open:"Nov", created:1949, domain:"600 ha de pistes", anecdote:"Anciennement connu sous le nom de Squaw Valley — site des JO d'Hiver 1960. Rebaptisé Palisades Tahoe en 2021 pour effacer le terme offensant 'squaw'. Le lac Tahoe, visible depuis les pistes, est le plus grand lac de montagne des États-Unis — 501m de profondeur, eau cristalline bleue. En bonne année, Tahoe reçoit jusqu'à 20 mètres de neige."},
+{id:413,name:"Taos Ski Valley",   region:"États-Unis", massif:"New Mexico Sangre de Cristo", alt:3804, lat:36.60, lon:-105.45,
+ open:"Nov", created:1955, domain:"300 ha de pistes", anecdote:"Station fondée par le célèbre skeur suisse Ernie Blake qui, après avoir survolé le Nouveau-Mexique en avion, a lancé une pelle de neige et déclaré 'on skiera ici'. Taos interdit les snowboards jusqu'en 2008 — record de résistance. La culture pueblo des Indiens Taos entoure la station — leur village ancestral, habité depuis 1000 ans, est classé UNESCO."},
+{id:414,name:"Big Sky",           region:"États-Unis", massif:"Montana Rockies", alt:3403, lat:45.29, lon:-111.40,
+ open:"Nov", created:1974, domain:"2400 ha de pistes", anecdote:"Le plus grand dénivelé continu des États-Unis — 1447m vertical du sommet jusqu'à la base. Big Sky est partenaire avec Moonlight Basin pour former l'un des plus grands domaines d'Amérique du Nord. La faible densité de skieurs (peu de files d'attente) et la neige sèche du Montana en font le secret bien gardé des skieurs qui fuient les foules d'Aspen et Vail."},
+{id:415,name:"Breckenridge",      region:"États-Unis", massif:"Colorado Rockies", alt:3914, lat:39.48, lon:-106.07,
+ open:"Nov", created:1961, domain:"2358 ha de pistes", anecdote:"La station la plus haute des États-Unis avec son sommet à 3914m — plus haut que le Mont-Blanc. Ancienne ville minière de la ruée vers l'or des années 1860 avec son centre historique victorien impeccablement conservé. Peak 6, ouvert en 2013, a ajouté 250 ha de terrain au-dessus de la limite des arbres avec des panoramas à couper le souffle."},
+{id:416,name:"Killington",        region:"États-Unis", massif:"Vermont Green Mountains", alt:1293, lat:43.67, lon:-72.82,
+ open:"Oct", created:1958, domain:"486 ha de pistes", anecdote:"La plus grande station de l'Est américain et celle qui ouvre le plus tôt — souvent dès octobre grâce à l'enneigement artificiel le plus avancé au monde. Surnommée 'The Beast of the East'. La K-1 Express Gondola est la plus rapide d'Amérique du Nord. Les fêtes d'après-ski légendaires attirent autant que les pistes."},
+{id:417,name:"Keystone",          region:"États-Unis", massif:"Colorado Rockies", alt:3654, lat:39.61, lon:-105.97,
+ open:"Oct", created:1970, domain:"800 ha de pistes", anecdote:"Première grande station à proposer du ski de nuit éclairé — 17 pistes illuminées jusqu'à 21h. Réputée familiale et accessible. Le lac Keystone, au pied de la montagne, se transforme en patinoire naturelle en hiver — spectacle unique face aux sommets enneigés du Colorado. Ouvre souvent dès fin octobre."},
+{id:418,name:"Crested Butte",     region:"États-Unis", massif:"Colorado Rockies", alt:3707, lat:38.87, lon:-106.99,
+ open:"Nov", created:1961, domain:"500 ha de pistes", anecdote:"Capitale mondiale du ski extrême — les couloirs de Crested Butte comme the Headwall, Spellbound Bowl et les faces nord impossibles ont construit une réputation mondiale parmi les skieurs les plus engagés. La ville de Crested Butte, classée National Historic District, est un des derniers vrais villages miniers victoriens intacts du Colorado."},
+{id:419,name:"Snowmass",          region:"États-Unis", massif:"Colorado Rockies", alt:3813, lat:39.21, lon:-106.94,
+ open:"Nov", created:1967, domain:"800 ha de pistes", anecdote:"Village-station construit ex nihilo à 8km d'Aspen. Le dénivelé vertical de Snowmass (1417m) est le plus grand du Colorado — l'une des grandes descentes d'Amérique. La Elk Camp Gondola dessert un plateau panoramique avec vue sur les Elk Mountains. Base très familiale contrastant avec le glamour d'Aspen toute proche."},
 ];
 
 // ════════════════════════════════════════════════════════
@@ -694,33 +803,204 @@ const REGION_BOUNDS={
   'Jura':         [[46.2,5.8],[47.1,6.7]],
   'Espagne':      [[36.7,-3.7],[43.1,3.1]],
   'Andorre':      [[42.4,1.4],[42.7,1.9]],
+  'Japon':        [[36.0,130.0],[44.5,145.5]],
+  'États-Unis':   [[36.5,-122.0],[51.0,-105.0]],
 };
 
+// ════════════ SUPABASE ════════════
+const SUPA_URL = 'https://xavrkighbeverdusuqlj.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhdnJraWdoYmV2ZXJkdXN1cWxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MjcxNTgsImV4cCI6MjA4ODIwMzE1OH0.mzTkkKtbi015K-H6z6XEP2H_T4en6KBKj9dckLcRBvE';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let currentUser = null;
+let authTab = 'login';
+
 // ════════════ STATE ════════════
-let visitedIds = new Set(JSON.parse(localStorage.getItem('ski_visited')||'[]'));
-let staysData  = JSON.parse(localStorage.getItem('ski_stays')||'{}');
+let visitedIds = new Set();
+let staysData  = {};
 let regionFilter = 'all';
 let currentSheet = null;
 
-function save(){
-  localStorage.setItem('ski_visited',JSON.stringify([...visitedIds]));
-  localStorage.setItem('ski_stays',JSON.stringify(staysData));
+// ════════════ AUTH UI ════════════
+function switchAuthTab(tab) {
+  authTab = tab;
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+  document.getElementById('auth-pw2').style.display = tab==='signup' ? '' : 'none';
+  document.getElementById('auth-submit-btn').textContent = tab==='login' ? 'Se connecter' : 'Créer mon compte';
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-ok').textContent = '';
+}
+
+async function authSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pw    = document.getElementById('auth-pw').value;
+  const pw2   = document.getElementById('auth-pw2').value;
+  const errEl = document.getElementById('auth-err');
+  const okEl  = document.getElementById('auth-ok');
+  const btn   = document.getElementById('auth-submit-btn');
+
+  errEl.textContent = ''; okEl.textContent = '';
+  if (!email || !pw) { errEl.textContent = 'Remplis tous les champs.'; return; }
+  if (authTab==='signup' && pw.length < 8) { errEl.textContent = 'Mot de passe trop court (8 caractères min.).'; return; }
+  if (authTab==='signup' && pw !== pw2) { errEl.textContent = 'Les mots de passe ne correspondent pas.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  if (authTab==='login') {
+    const { data, error } = await supa.auth.signInWithPassword({ email, password: pw });
+    if (error) { errEl.textContent = error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect.' : error.message; btn.disabled=false; btn.textContent='Se connecter'; return; }
+    onSignIn(data.user);
+  } else {
+    const { data, error } = await supa.auth.signUp({ email, password: pw });
+    if (error) { errEl.textContent = error.message; btn.disabled=false; btn.textContent='Créer mon compte'; return; }
+    if (data.user && data.session) {
+      onSignIn(data.user);
+    } else {
+      okEl.textContent = 'Compte créé ! Vérifie tes emails pour confirmer.';
+      btn.disabled=false; btn.textContent='Créer mon compte';
+    }
+  }
+}
+
+async function onSignIn(user) {
+  currentUser = user;
+  document.getElementById('auth-overlay').classList.add('hidden');
+  const short = user.email.split('@')[0];
+  const pill = document.getElementById('user-pill');
+  pill.innerHTML = `👤 ${short}`;
+  pill.title = `Connecté : ${user.email}\nCliquer pour se déconnecter`;
+  await loadFromCloud();
+  initMap();
+  updateStats();
+}
+
+async function signOut() {
+  if (!confirm('Se déconnecter ?')) return;
+  await supa.auth.signOut();
+  currentUser = null;
+  visitedIds = new Set();
+  staysData = {};
+  document.getElementById('user-pill').innerHTML = '';
+  // Reset markers
+  Object.values(markers).forEach(m => m.setIcon(mkIcon(false)));
+  updateStats();
+  renderRegionDropdown();
+  document.getElementById('auth-overlay').classList.remove('hidden');
+  document.getElementById('auth-pw').value = '';
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-ok').textContent = '';
+  document.getElementById('auth-submit-btn').disabled = false;
+  document.getElementById('auth-submit-btn').textContent = 'Se connecter';
+}
+
+// ════════════ CLOUD SYNC ════════════
+async function loadFromCloud() {
+  const uid = currentUser.id;
+  // Load visited
+  const { data: vis } = await supa.from('visited_stations').select('station_id').eq('user_id', uid);
+  visitedIds = new Set((vis||[]).map(r => r.station_id));
+  // Load stays
+  const { data: st } = await supa.from('stays').select('*').eq('user_id', uid);
+  staysData = {};
+  (st||[]).forEach(r => {
+    if (!staysData[r.station_id]) staysData[r.station_id] = [];
+    staysData[r.station_id].push({ id: r.id, from: r.date_from, to: r.date_to });
+  });
+  // Update markers if map already inited
+  Object.entries(markers).forEach(([id, m]) => {
+    m.setIcon(mkIcon(visitedIds.has(parseInt(id))));
+  });
+  updateStats();
+  renderRegionDropdown();
+}
+
+async function cloudAddVisited(stationId) {
+  if (!currentUser) return;
+  await supa.from('visited_stations').upsert({ user_id: currentUser.id, station_id: stationId }, { onConflict: 'user_id,station_id' });
+}
+async function cloudRemoveVisited(stationId) {
+  if (!currentUser) return;
+  await supa.from('visited_stations').delete().eq('user_id', currentUser.id).eq('station_id', stationId);
+}
+async function cloudAddStay(stationId, from, to) {
+  if (!currentUser) return null;
+  const { data } = await supa.from('stays').insert({ user_id: currentUser.id, station_id: stationId, date_from: from, date_to: to||from }).select().single();
+  return data;
+}
+async function cloudDelStay(stayDbId) {
+  if (!currentUser) return;
+  await supa.from('stays').delete().eq('id', stayDbId);
+}
+
+// ════════════ TOGGLE ════════════
+async function toggleStation(id) {
+  if (visitedIds.has(id)) {
+    visitedIds.delete(id);
+    cloudRemoveVisited(id);
+  } else {
+    visitedIds.add(id);
+    cloudAddVisited(id);
+    toast('✓ ' + STATIONS.find(s=>s.id===id)?.name);
+  }
+  updateStats(); renderRegionDropdown();
+}
+
+// ════════════ STAYS ════════════
+async function addStay() {
+  if (!currentSheet) return;
+  const from = document.getElementById('stay-from').value;
+  const to   = document.getElementById('stay-to').value;
+  if (!from) { toast('Indique au moins une date d\'arrivée'); return; }
+  const id = currentSheet.id;
+
+  const btn = document.querySelector('.stay-add-btn');
+  btn.disabled = true; btn.textContent = '...';
+
+  const row = await cloudAddStay(id, from, to||from);
+  if (!staysData[id]) staysData[id] = [];
+  staysData[id].push({ id: row?.id, from, to: to||from });
+  staysData[id].sort((a,b) => a.from.localeCompare(b.from));
+
+  document.getElementById('stay-from').value = '';
+  document.getElementById('stay-to').value = '';
+  btn.disabled = false; btn.textContent = '+ Ajouter';
+
+  renderStays(id);
+  if (!visitedIds.has(id)) {
+    await toggleStation(id);
+    const m = markers[id];
+    if (m) { m.setIcon(mkIcon(true)); m.setPopupContent(mkMiniPopup(currentSheet)); }
+    refreshSheetBtn();
+    toast(`✓ ${currentSheet.name} marquée comme visitée`);
+  } else {
+    toast('Séjour ajouté !');
+  }
+}
+
+async function delStay(stationId, idx) {
+  const stay = staysData[stationId]?.[idx];
+  if (!stay) return;
+  if (stay.id) await cloudDelStay(stay.id);
+  staysData[stationId].splice(idx, 1);
+  renderStays(stationId);
 }
 
 // ════════════ MAP ════════════
 let map, markers={}, tileLayers={}, currentLayer='topo';
 
 const TILE_DEFS={
-  topo:      {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', filter:'brightness(0.8) saturate(0.7) sepia(0.15)'},
-  satellite: {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', filter:'brightness(0.85) saturate(0.8)'},
-  street:    {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', filter:'brightness(0.7) saturate(0.6) sepia(0.2)'},
-  winter:    {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', filter:'brightness(0.92) saturate(0.15) hue-rotate(180deg) contrast(1.05)'},
+  topo:      {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',                                                                     maxZoom:17, filter:'brightness(0.82) saturate(0.75) sepia(0.12)'},
+  satellite: {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',                        maxZoom:19, filter:'brightness(0.88) saturate(0.85)'},
+  street:    {url:'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',                                                              maxZoom:20, filter:'brightness(0.72) saturate(0.6) sepia(0.18)'},
+  winter:    {url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',                                                                   maxZoom:19, filter:'brightness(0.92) saturate(0.15) hue-rotate(180deg) contrast(1.05)'},
 };
 
 function initMap(){
-  map=L.map('leaflet-map',{center:[45.8,7.5],zoom:7,zoomControl:false,attributionControl:false});
+  map=L.map('leaflet-map',{center:[45.8,7.5],zoom:7,zoomControl:false,attributionControl:false,maxZoom:20});
   Object.entries(TILE_DEFS).forEach(([key,def])=>{
-    tileLayers[key]=L.tileLayer(def.url,{maxZoom:17,minZoom:4});
+    tileLayers[key]=L.tileLayer(def.url,{maxZoom:def.maxZoom||19,minZoom:2,maxNativeZoom:def.maxZoom||19});
   });
   tileLayers['topo'].addTo(map);
   applyTileFilter('topo');
@@ -837,35 +1117,6 @@ function fmt(d){
   return `${day}/${m}/${y}`;
 }
 
-function addStay(){
-  if(!currentSheet) return;
-  const from=document.getElementById('stay-from').value;
-  const to=document.getElementById('stay-to').value;
-  if(!from){toast('Indique au moins une date d\'arrivée');return;}
-  const id=currentSheet.id;
-  if(!staysData[id]) staysData[id]=[];
-  staysData[id].push({from,to:to||from});
-  staysData[id].sort((a,b)=>a.from.localeCompare(b.from));
-  save();
-  renderStays(id);
-  document.getElementById('stay-from').value='';
-  document.getElementById('stay-to').value='';
-  // Auto-mark as visited
-  if(!visitedIds.has(id)){
-    visitedIds.add(id); save(); updateStats(); renderRegionDropdown();
-    const m=markers[id]; if(m){m.setIcon(mkIcon(true));m.setPopupContent(mkMiniPopup(currentSheet));}
-    refreshSheetBtn();
-    toast(`✓ ${currentSheet.name} marquée comme visitée`);
-  } else {
-    toast('Séjour ajouté !');
-  }
-}
-
-function delStay(stationId,idx){
-  staysData[stationId]?.splice(idx,1);
-  save(); renderStays(stationId);
-}
-
 // ════════════ REGION DROPDOWN ════════════
 function renderRegionDropdown(){
   const dd=document.getElementById('region-dropdown');
@@ -895,13 +1146,6 @@ function setActiveRd(region,special){
 function toggleRegionDropdown(){
   document.getElementById('gear-btn').classList.toggle('open');
   document.getElementById('region-dropdown').classList.toggle('open');
-}
-
-// ════════════ TOGGLE ════════════
-function toggleStation(id){
-  if(visitedIds.has(id)) visitedIds.delete(id);
-  else{visitedIds.add(id);toast('✓ '+STATIONS.find(s=>s.id===id)?.name);}
-  save(); updateStats(); renderRegionDropdown();
 }
 
 // ════════════ FUZZY SEARCH ════════════
@@ -978,7 +1222,7 @@ function renderDoneList(){
         ${stays?`<div class="d-stays">⛷ ${stays} séjour${stays>1?'s':''}</div>`:''}
       </div>
       <button class="del-btn" title="Retirer"><svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 1l8 8M9 1L1 9"/></svg></button>`;
-      item.querySelector('.del-btn').onclick=e=>{e.stopPropagation();visitedIds.delete(s.id);save();updateStats();const m=markers[s.id];if(m){m.setIcon(mkIcon(false));m.setPopupContent(mkMiniPopup(s));}renderDoneList();renderRegionDropdown();};
+      item.querySelector('.del-btn').onclick=e=>{e.stopPropagation();toggleStation(s.id);updateStats();const m=markers[s.id];if(m){m.setIcon(mkIcon(false));m.setPopupContent(mkMiniPopup(s));}renderDoneList();renderRegionDropdown();};
       item.onclick=(e)=>{if(e.target.closest('.del-btn')) return;showPage('map');setTimeout(()=>{map.setView([s.lat,s.lon],12);const m=markers[s.id];if(m)m.openPopup();},200);};
       el.appendChild(item);
     });
@@ -1024,7 +1268,22 @@ document.addEventListener('click',e=>{
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
 // ════════════ INIT ════════════
-window.addEventListener('DOMContentLoaded',()=>{initMap();updateStats();});
+window.addEventListener('DOMContentLoaded', async () => {
+  // Check if already logged in
+  const { data: { session } } = await supa.auth.getSession();
+  if (session?.user) {
+    await onSignIn(session.user);
+  } else {
+    initMap();
+    updateStats();
+  }
+  // Listen for auth changes
+  supa.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session?.user && !currentUser) {
+      await onSignIn(session.user);
+    }
+  });
+});
 </script>
 </body>
 </html>
