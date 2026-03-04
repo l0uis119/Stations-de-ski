@@ -255,25 +255,6 @@ mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
 </head>
 <body>
 
-<!-- AUTH MODAL -->
-<div class="auth-overlay" id="auth-overlay">
-  <div class="auth-box">
-    <div class="auth-logo">Peak<em>Done</em></div>
-    <div class="auth-title">Suis tes stations sur tous tes appareils</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
-    </div>
-    <div class="auth-fields">
-      <input class="auth-input" id="auth-email" type="email" placeholder="Adresse email" autocomplete="email">
-      <input class="auth-input" id="auth-pw" type="password" placeholder="Mot de passe (8 caractères min.)" autocomplete="current-password">
-      <input class="auth-input" id="auth-pw2" type="password" placeholder="Confirmer le mot de passe" style="display:none">
-    </div>
-    <div class="auth-err" id="auth-err"></div>
-    <div class="auth-ok" id="auth-ok"></div>
-    <button class="auth-btn" id="auth-submit-btn" onclick="authSubmit()">Se connecter</button>
-  </div>
-</div>
 
 <nav>
   <div class="logo">Peak<em>Done</em></div>
@@ -393,6 +374,26 @@ mark{background:rgba(232,133,74,.22);color:var(--accent2);border-radius:2px;}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- AUTH MODAL — placé en dernier pour être au-dessus de tout -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">Peak<em>Done</em></div>
+    <div class="auth-title">Suis tes stations sur tous tes appareils</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
+    </div>
+    <div class="auth-fields">
+      <input class="auth-input" id="auth-email" type="email" placeholder="Adresse email" autocomplete="email">
+      <input class="auth-input" id="auth-pw" type="password" placeholder="Mot de passe (8 caractères min.)" autocomplete="current-password">
+      <input class="auth-input" id="auth-pw2" type="password" placeholder="Confirmer le mot de passe" style="display:none">
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-ok" id="auth-ok"></div>
+    <button class="auth-btn" id="auth-submit-btn" onclick="authSubmit()">Se connecter</button>
+  </div>
+</div>
 
 <script>
 // ══════════════════════════════════════════════════════════
