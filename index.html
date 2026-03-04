@@ -933,17 +933,25 @@ async function authSubmit() {
 
 async function onSignIn(user) {
   currentUser = user;
-  document.getElementById('auth-overlay').classList.add('hidden');
+  const overlay = document.getElementById('auth-overlay');
+  overlay.classList.add('hidden');
+  overlay.style.display = 'none'; // force hide immediately
+
   const short = user.email.split('@')[0];
   const pill = document.getElementById('user-pill');
   pill.innerHTML = `👤 ${short}`;
   pill.title = `Connecté : ${user.email}\nCliquer pour se déconnecter`;
   await loadFromCloud();
-  initMap();
   updateStats();
-  // Force map to recalculate size after modal closes (critical on mobile)
-  setTimeout(() => { if(map) map.invalidateSize(true); }, 100);
-  setTimeout(() => { if(map) map.invalidateSize(true); }, 500);
+
+  // Wait for DOM to repaint before initializing map
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      initMap();
+      setTimeout(() => { if(map) map.invalidateSize(true); }, 200);
+      setTimeout(() => { if(map) map.invalidateSize(true); }, 800);
+    });
+  });
 }
 
 async function signOut() {
@@ -1068,6 +1076,7 @@ const TILE_DEFS={
 };
 
 function initMap(){
+  if(map) return; // already initialized
   map=L.map('leaflet-map',{center:[45.8,7.5],zoom:7,zoomControl:false,attributionControl:false,maxZoom:20});
   Object.entries(TILE_DEFS).forEach(([key,def])=>{
     tileLayers[key]=L.tileLayer(def.url,{maxZoom:def.maxZoom||19,minZoom:2,maxNativeZoom:def.maxZoom||19});
@@ -1384,10 +1393,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await supa.auth.getSession();
   if (session?.user) {
     await onSignIn(session.user);
-  } else {
-    initMap();
-    updateStats();
   }
+  // else: wait for user to log in, map init happens in onSignIn
   // Listen for auth changes
   supa.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user && !currentUser) {
