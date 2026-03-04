@@ -68,7 +68,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px
 
 /* ─── MAP PAGE ─── */
 #page-map{position:relative;}
-#leaflet-map{width:100%;height:100%;}
+#leaflet-map{width:100%;height:100%;position:absolute;top:0;left:0;}
 
 /* Tile filter – warm, slightly brighter */
 .leaflet-tile-pane{filter:brightness(0.72) saturate(0.55) sepia(0.25);}
@@ -941,6 +941,9 @@ async function onSignIn(user) {
   await loadFromCloud();
   initMap();
   updateStats();
+  // Force map to recalculate size after modal closes (critical on mobile)
+  setTimeout(() => { if(map) map.invalidateSize(true); }, 100);
+  setTimeout(() => { if(map) map.invalidateSize(true); }, 500);
 }
 
 async function signOut() {
