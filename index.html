@@ -31,8 +31,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 /* ─── NAV ─── */
 nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right));height:50px;border-bottom:1px solid var(--border);background:var(--bg);z-index:1000;flex-shrink:0;position:relative;}
-.logo{font-family:'Playfair Display',serif;font-style:italic;font-size:21px;color:var(--snow);letter-spacing:-.3px;}
-.logo em{color:var(--accent);font-style:normal;}
+.logo{font-family:'Playfair Display',serif;font-style:italic;font-size:21px;color:var(--accent);letter-spacing:-.3px;}
+.logo em{color:var(--snow);font-style:normal;}
 .nav-right{display:flex;align-items:center;gap:10px;}
 .stats-pill{font-size:11px;color:var(--muted);letter-spacing:.3px;}
 .stats-pill strong{color:var(--accent2);font-weight:500;}
@@ -838,6 +838,347 @@ const STATIONS = [
 // ── KAZAKHSTAN ─────────────────────────────────────────
 {id:580,name:"Shymbulak",          region:"Kazakhstan", massif:"Tian Shan", alt:3200, lat:43.14, lon:77.08,
  open:"Nov", created:1954, domain:"20 km de pistes", anecdote:"À 25km d'Almaty, la plus grande ville du Kazakhstan, Shymbulak est nichée dans un cirque naturel des monts Tian Shan. Construite à l'époque soviétique pour les athlètes d'élite, elle accueille aujourd'hui une clientèle kazakhe aisée. La neige des Tian Shan — 'les Montagnes Célestes' en turcique — est réputée pour sa légèreté exceptionnelle."},
+// ── CANADA ─────────────────────────────────────────────
+{id:600,name:"Banff (Lake Louise)",region:"Canada", massif:"Rocheuses canadiennes", alt:2637, lat:51.42, lon:-116.18,
+ open:"Nov", created:1954, domain:"4200 ha (SkiBig3)", anecdote:"Au cœur du parc national de Banff, site UNESCO — skier ici c'est skier dans un décor protégé par la loi depuis 1885. Le lac Louise gelé, turquoise en été, est visible depuis les pistes. Les grizzlis hibernent sous les pistes. SkiBig3 regroupe Lake Louise, Sunshine et Mt Norquay pour un des plus grands domaines d'Amérique du Nord."},
+{id:601,name:"Whistler (BC)",      region:"Canada", massif:"Coast Mountains BC", alt:2182, lat:50.11, lon:-122.96,
+ open:"Nov", created:1966, domain:"3307 ha de pistes", anecdote:"Le plus grand domaine skiable d'Amérique du Nord. Whistler Blackcomb a accueilli les épreuves de ski des JO de Vancouver 2010. La gondole Peak 2 Peak, reliant les deux sommets à 436m au-dessus de la vallée sur 4,4 km, détient plusieurs records mondiaux. La ville de Whistler, construite de toutes pièces dans les années 70, est un modèle d'urbanisme de station."},
+{id:602,name:"Mont-Tremblant",     region:"Canada", massif:"Laurentides", alt:875, lat:46.12, lon:-74.60,
+ open:"Nov", created:1939, domain:"102 pistes", anecdote:"La plus ancienne station de l'Est canadien, fondée en 1939. Mont-Tremblant est au Québec ce que Courchevel est aux Alpes — le symbole du ski chic francophone. Le village piéton aux maisons colorées rappelle un village québécois du 18ème siècle. Les températures descendent parfois à -30°C — une neige sèche et légère garantie."},
+{id:603,name:"Revelstoke",         region:"Canada", massif:"Colombie-Britannique", alt:2225, lat:50.99, lon:-118.16,
+ open:"Déc", created:2007, domain:"3121 ha de pistes", anecdote:"Le plus grand dénivelé vertical de l'Amérique du Nord — 1713m du sommet à la base. Revelstoke est une station récente (2007) qui est devenue en quelques années la destination numéro un des freerideurs nord-américains. La neige des Selkirks, plus légère et plus abondante qu'à Whistler, attire les puristes de la poudreuse."},
+{id:604,name:"Big White",          region:"Canada", massif:"Colombie-Britannique", alt:2319, lat:49.73, lon:-118.93,
+ open:"Nov", created:1963, domain:"2765 ha de pistes", anecdote:"Connue pour ses fantômes de neige — des sapins entièrement recouverts de neige et de glace qui créent des sculptures naturelles spectaculaires sur les pistes. Big White reçoit jusqu'à 7,5m de neige par an dans les Okanagan Highlands. Station très familiale, l'une des plus enneigées de Colombie-Britannique."},
+{id:605,name:"Fernie Alpine",      region:"Canada", massif:"Colombie-Britannique", alt:2133, lat:49.47, lon:-115.09,
+ open:"Nov", created:1962, domain:"2504 ha de pistes", anecdote:"Nichée dans les Rockies de Colombie-Britannique, Fernie est réputée pour ses cinq cuvettes spectaculaires et sa neige légère. La ville de Fernie, ancienne cité minière du charbon, a conservé ses bâtiments victoriens en brique rouge. La légende dit qu'une sorcière Kootenay avait maudit la ville — les habitants ont levé la malédiction en 1964."},
+// ── FINLANDE ───────────────────────────────────────────
+{id:610,name:"Levi",               region:"Finlande", massif:"Laponie", alt:531, lat:67.80, lon:24.84,
+ open:"Nov", created:1968, domain:"43 km de pistes", anecdote:"La plus grande station de Finlande, à 170km au nord du Cercle Polaire Arctique. Le soleil ne se lève pas pendant 3 semaines en décembre — on skie sous les aurores boréales et la lumière bleue du crépuscule polaire permanent. Les rennes errent librement autour des pistes. La température peut descendre à -40°C."},
+{id:611,name:"Ruka",               region:"Finlande", massif:"Laponie", alt:492, lat:66.17, lon:29.14,
+ open:"Oct", created:1954, domain:"35 km de pistes", anecdote:"Ouvre en octobre — l'une des premières stations d'Europe à la saison. Ruka est le point de départ du Karhunkierros, le circuit de randonnée le plus célèbre de Finlande. Le lac Kitka gelé offre des excursions en motoneige. La tribu Sami, peuple autochtone lapon, pratique encore l'élevage de rennes dans cette région."},
+// ── ISLANDE ────────────────────────────────────────────
+{id:620,name:"Bláfjöll",           region:"Islande", massif:"Reykjanes", alt:820, lat:64.02, lon:-21.67,
+ open:"Jan", created:1956, domain:"15 km de pistes", anecdote:"La station de ski la plus proche d'une capitale européenne — à 25 km de Reykjavik. Skier en Islande c'est skier sur un champ de lave recouvert de neige, avec vue sur l'océan Atlantique et parfois le Groenland par temps clair. Les aurores boréales sont quasi-garanties en soirée de janvier à mars."},
+// ── ÉCOSSE ─────────────────────────────────────────────
+{id:630,name:"Cairngorm Mountain", region:"Écosse", massif:"Cairngorms", alt:1245, lat:57.12, lon:-3.66,
+ open:"Déc", created:1961, domain:"30 km de pistes", anecdote:"La station la plus nordique de Grande-Bretagne, dans le parc national des Cairngorms. La météo y est parmi les plus imprévisibles d'Europe — vents à 200 km/h possibles au sommet. Le funiculaire Cairngorm Mountain Railway, inauguré en 2001, est le seul funiculaire de montagne des îles britanniques encore en service."},
+{id:631,name:"Glencoe Mountain",   region:"Écosse", massif:"Highlands", alt:1108, lat:56.67, lon:-4.87,
+ open:"Déc", created:1956, domain:"20 km de pistes", anecdote:"Dans le légendaire Glen Coe, théâtre du massacre de 1692 où les Campbell massacrèrent les MacDonald. Les falaises volcaniques noires et les pentes raides donnent une atmosphère dramatique unique au monde. La station est gérée par ses membres comme une coopérative depuis 1956 — un modèle unique dans le ski mondial."},
+// ── SLOVÉNIE ───────────────────────────────────────────
+{id:640,name:"Kranjska Gora",      region:"Slovénie", massif:"Alpes juliennes", alt:1570, lat:46.48, lon:13.79,
+ open:"Déc", created:1953, domain:"20 km de pistes", anecdote:"La capitale du ski slovène — Kranjska Gora accueille chaque année une manche de Coupe du Monde de slalom et slalom géant. Le Triglav, plus haut sommet de Slovénie (2864m), domine le paysage. La station est à 30km de l'Italie et de l'Autriche — carrefour culturel unique où se mêlent influences slaves, germaniques et latines."},
+// ── ROUMANIE ───────────────────────────────────────────
+{id:650,name:"Poiana Brasov",      region:"Roumanie", massif:"Carpates", alt:1800, lat:45.59, lon:25.54,
+ open:"Déc", created:1936, domain:"24 km de pistes", anecdote:"À 13km de Brasov, dans les Carpates transylvaniennes. Construite sous le régime Ceaucescu comme vitrine du socialisme roumain. Le château de Bran — le 'château de Dracula' — est visible à 30km. Les loups et les ours des Carpates rodent dans les forêts entourant les pistes — plusieurs avistements chaque saison."},
+// ── BULGARIE ───────────────────────────────────────────
+{id:660,name:"Bansko",             region:"Bulgarie", massif:"Pirin", alt:2600, lat:41.84, lon:23.49,
+ open:"Déc", created:2004, domain:"75 km de pistes", anecdote:"La station la plus moderne des Balkans, construite en 2004 dans la ville médiévale de Bansko classée UNESCO. La vieille ville avec ses maisons en pierre fortifiées du 18ème siècle contraste radicalement avec les infrastructures ski ultra-modernes. Bansko accueille des manches de Coupe du Monde et est la destination ski la moins chère d'Europe."},
+// ── SERBIE ─────────────────────────────────────────────
+{id:670,name:"Kopaonik",           region:"Serbie", massif:"Kopaonik", alt:2017, lat:43.27, lon:20.82,
+ open:"Déc", created:1981, domain:"55 km de pistes", anecdote:"Le toit de la Serbie — Kopaonik est le plus grand massif montagneux serbe avec 55 km de pistes bien tracées. Station construite sous Tito avec une architecture brutaliste caractéristique du socialisme yougoslave. Les sources chaudes sulfureuses naturelles du massif alimentent plusieurs spas. Destination très prisée des Serbes, Bosniaques et Macédoniens."},
+// ── GRÈCE ──────────────────────────────────────────────
+{id:680,name:"Parnassos",          region:"Grèce", massif:"Parnasse", alt:2260, lat:38.57, lon:22.56,
+ open:"Jan", created:1976, domain:"36 km de pistes", anecdote:"Skier sur le mont Parnasse — la montagne sacrée d'Apollon et des Muses dans la mythologie grecque. À 25km de Delphes et l'Oracle, classé UNESCO. Depuis les pistes on aperçoit par temps clair le golfe de Corinthe et le Péloponnèse. Station la plus fréquentée de Grèce avec une clientèle 100% grecque, très festive le week-end."},
+// ── LIBAN ──────────────────────────────────────────────
+{id:690,name:"Mzaar Kfardebian",   region:"Liban", massif:"Mont-Liban", alt:2465, lat:33.97, lon:35.68,
+ open:"Jan", created:1953, domain:"80 km de pistes", anecdote:"La plus grande station de ski du Moyen-Orient — on peut skier le matin dans la neige libanaise et nager dans la Méditerranée l'après-midi (40km). Le cèdre du Liban, symbole national, pousse dans les forêts entourant les pistes. Malgré les tensions politiques chroniques, Mzaar reste ouverte et très fréquentée par les Libanais de la diaspora."},
+// ── TURQUIE ────────────────────────────────────────────
+{id:700,name:"Uludağ",             region:"Turquie", massif:"Bursa", alt:2543, lat:40.10, lon:29.22,
+ open:"Déc", created:1935, domain:"22 km de pistes", anecdote:"La plus ancienne station de Turquie, à 35km de Bursa. Uludağ signifie 'grande montagne' en turc. La téléphérique de Bursa, inaugurée en 1963, est l'une des plus longues d'Europe avec ses 8,9km. Les fameuses 'pides' (pizzas turques) servies dans les refuges d'altitude sont réputées dans tout le pays."},
+{id:701,name:"Palandöken",         region:"Turquie", massif:"Erzurum", alt:3176, lat:39.86, lon:41.19,
+ open:"Nov", created:1993, domain:"32 km de pistes", anecdote:"La station la plus enneigée de Turquie à 2200m d'altitude dans les montagnes de l'Anatolie orientale. Palandöken a accueilli les Universiades d'Hiver 2011. La neige y est très légère et abondante — jusqu'à 8m par saison grâce aux perturbations venues de la mer Noire. La ville d'Erzurum, ancienne forteresse byzantine et ottomane, est à 10 minutes."},
+// ── INDE ───────────────────────────────────────────────
+{id:710,name:"Gulmarg",            region:"Inde", massif:"Cachemire", alt:4138, lat:34.04, lon:74.38,
+ open:"Déc", created:1927, domain:"20 km de pistes", anecdote:"La station de ski la plus haute du monde accessible par téléphérique à 4138m dans l'Himalaya du Cachemire. Construite par les Britanniques en 1927 comme destination de villégiature estivale. La neige himalayenne est d'une légèreté exceptionnelle. Malgré les tensions géopolitiques indo-pakistanaises dans la région, la station reste ouverte et très prisée des aventuriers."},
+// ── CHINE ──────────────────────────────────────────────
+{id:720,name:"Zhangjiakou (Genting)",region:"Chine", massif:"Hebei", alt:2198, lat:40.96, lon:115.28,
+ open:"Nov", created:2016, domain:"50 km de pistes", anecdote:"Site principal des JO de Pékin 2022 — les épreuves nordiques et biathlon s'y sont déroulées. Construit de toutes pièces en 5 ans dans le désert de Gobi aux confins du plateau mongol. La neige naturelle y est rarissime — 95% de la neige est artificielle. Symbole de l'ambition olympique chinoise et du défi environnemental que représentent les JO dans des régions arides."},
+{id:721,name:"Yabuli",             region:"Chine", massif:"Manchourie", alt:1374, lat:44.99, lon:128.41,
+ open:"Nov", created:1980, domain:"40 km de pistes", anecdote:"La plus grande station de Chine du nord-est, dans les forêts de Mandchourie. Yabuli a été la station d'entraînement de l'équipe nationale chinoise pendant 40 ans. La neige de Mandchourie, influencée par la Sibérie, est légère et abondante — jusqu'à -30°C en janvier. Les tigres de l'Amour, espèce en danger critique, vivent dans les forêts voisines."},
+// ── CORÉE DU SUD ───────────────────────────────────────
+{id:730,name:"Yongpyong",          region:"Corée du Sud", massif:"Taebaek", alt:1458, lat:37.64, lon:128.67,
+ open:"Nov", created:1975, domain:"31 km de pistes", anecdote:"La plus grande station de Corée du Sud et site des épreuves de slalom des JO de PyeongChang 2018. Yongpyong est aussi connue comme décor du drama coréen 'Winter Sonata' qui a déclenché la 'Korean Wave' touristique en Asie dans les années 2000. La station possède le premier snowpark éclairé d'Asie."},
+{id:731,name:"Alpensia",           region:"Corée du Sud", massif:"Taebaek", alt:1370, lat:37.70, lon:128.72,
+ open:"Nov", created:2009, domain:"6 tremplins + 6 pistes", anecdote:"Construit spécifiquement pour les JO de PyeongChang 2018 — les tremplins de saut et les épreuves de biathlon s'y sont déroulés. Alpensia est un resort luxueux qui a coûté 1,5 milliard de dollars. Après les JO, la station peine à remplir ses hôtels — cas d'école du 'syndrome olympique' des infrastructures surdimensionnées."},
+// ── AUSTRALIE ──────────────────────────────────────────
+{id:740,name:"Perisher",           region:"Australie", massif:"Snowy Mountains NSW", alt:2034, lat:-36.40, lon:148.42,
+ open:"Juin", created:1939, domain:"1245 ha de pistes", anecdote:"La plus grande station de l'hémisphère sud avec 47 remontées mécaniques. Le train Skitube, tunnel ferroviaire de 8,5km sous la montagne, est le seul train de montagne sous-terrain d'Australie. La neige australienne tombe de juin à octobre. Les wombats et wallabies des montagnes enneigées se font parfois surprendre sur les pistes."},
+{id:741,name:"Thredbo",            region:"Australie", massif:"Snowy Mountains NSW", alt:2037, lat:-36.50, lon:148.30,
+ open:"Juin", created:1957, domain:"480 ha de pistes", anecdote:"Le plus grand dénivelé d'Australie — 672m de la crête de Crackenback au village. Thredbo a accueilli la première Coupe du Monde de ski alpin de l'hémisphère sud en 1979. Le glissement de terrain de 1997 a détruit plusieurs lodges et tué 18 personnes — Stuart Diver y a survécu 65 heures sous les décombres, une des plus grandes histoires de survie australiennes."},
+// ── AFRIQUE DU SUD ─────────────────────────────────────
+{id:750,name:"Tiffindell",         region:"Afrique du Sud", massif:"Drakensberg", alt:2756, lat:-30.78, lon:27.98,
+ open:"Juin", created:1993, domain:"4 pistes", anecdote:"La seule station de ski d'Afrique subsaharienne, dans les monts Drakensberg. Skier en Afrique du Sud — à 400km de Durban — est une expérience absolument unique. La neige naturelle est rare et imprévisible ; la station survit grâce à l'enneigement artificiel. Vue imprenable sur le royaume du Lesotho voisin depuis les pistes."},
+// ── MEXIQUE ────────────────────────────────────────────
+{id:760,name:"Bosques de Monterreal",region:"Mexique", massif:"Sierra Madre", alt:2850, lat:25.55, lon:-100.44,
+ open:"Déc", created:2004, domain:"3 pistes", anecdote:"La seule station de ski du Mexique — une curiosité géographique absolue dans la Sierra Madre à 200km de Monterrey. La neige est artificielle à 100% et la saison ne dure que quelques semaines. Des millions de Mexicains n'ont jamais vu la neige de leur vie — Bosques de Monterreal leur offre cette expérience improbable à quelques heures de chez eux."},
+// ── BRÉSIL ─────────────────────────────────────────────
+{id:770,name:"Serra Gaúcha (Caracol)",region:"Brésil", massif:"Serra Gaúcha", alt:1020, lat:-29.18, lon:-50.53,
+ open:"Juil", created:1987, domain:"Pistes artificielles", anecdote:"La seule 'station de ski' du Brésil, dans la région de Gramado colonisée par des immigrants allemands et italiens au 19ème siècle. La neige naturelle est rarissime — il ne neige que quelques heures par an au maximum. Les 'pistes' sont en réalité des tapis de neige artificielle. Mais l'ambiance européenne du village, les fondue et la bière artisanale en font une destination unique en Amérique du Sud."},
+// ── ÉMIRATS ARABES UNIS ────────────────────────────────
+{id:780,name:"Ski Dubai",          region:"Émirats Arabes Unis", massif:"Dubai (intérieur)", alt:0, lat:25.12, lon:55.20,
+ open:"Toute l'année", created:2005, domain:"22 500 m²", anecdote:"La station de ski intérieure la plus grande du monde — dans un centre commercial de Dubai, à 400m des plages du golfe Persique sous 40°C. Ski Dubai maintient -4°C en permanence avec 6000 tonnes de neige. Pingouins en liberté dans la piste. Symbole absolu de l'ultra-consumérisme du Golfe et de l'absurdité climatique assumée."},
+// ── RUSSIE ─────────────────────────────────────────────
+{id:790,name:"Rosa Khutor",        region:"Russie", massif:"Caucase occidental", alt:2320, lat:43.68, lon:40.29,
+ open:"Déc", created:2011, domain:"102 km de pistes", anecdote:"Station construite de toutes pièces pour les JO de Sotchi 2014 — 7 milliards de dollars investis en 4 ans. Rosa Khutor a accueilli toutes les épreuves alpines des JO. Le paradoxe absolu : construire une station de ski à Sotchi, ville balnéaire subtropicale au bord de la mer Noire. La neige du Caucase, influencée par la mer, est lourde mais abondante."},
+{id:791,name:"Krasnaya Polyana",   region:"Russie", massif:"Caucase occidental", alt:2238, lat:43.69, lon:40.27,
+ open:"Déc", created:1992, domain:"80 km de pistes", anecdote:"Voisine de Rosa Khutor dans la vallée de Mzymta, Krasnaya Polyana signifie 'belle clairière rouge'. Station préférée de Vladimir Poutine — sa résidence de montagne y est construite. Plusieurs leaders soviétiques y venaient en villégiature depuis les années 50. Le contraste entre le luxe des chalets et l'austérité militaire de la sécurité est saisissant."},
+// ── UKRAINE ────────────────────────────────────────────
+{id:800,name:"Bukovel",            region:"Ukraine", massif:"Carpates ukrainiennes", alt:1372, lat:48.36, lon:24.40,
+ open:"Déc", created:2000, domain:"60 km de pistes", anecdote:"La plus grande station d'Europe de l'Est, construite en 2000 dans les Carpates ukrainiennes. Bukovel est devenue en 20 ans la station la plus fréquentée d'Ukraine avec 1 million de skieurs par saison. Malgré la guerre commencée en 2022, la station a maintenu une activité partielle — symbole de résistance culturelle et touristique."},
+// ── POLOGNE ────────────────────────────────────────────
+{id:810,name:"Zakopane",           region:"Pologne", massif:"Tatras", alt:2499, lat:49.30, lon:19.95,
+ open:"Déc", created:1936, domain:"50 km de pistes", anecdote:"La capitale du ski polonais, au pied des Tatras — les seules vraies montagnes de Pologne. Zakopane est aussi le berceau du style architectural 'Zakopane Style', mélange d'art populaire highlander et Art Nouveau. Les Gorales (highlanders des Tatras) portent encore leurs costumes traditionnels brodés et jouent de la musique folk dans les refuges."},
+// ── SLOVAQUIE ──────────────────────────────────────────
+{id:820,name:"Jasná",              region:"Slovaquie", massif:"Basse-Tatras", alt:2024, lat:48.94, lon:19.62,
+ open:"Déc", created:1932, domain:"50 km de pistes", anecdote:"La plus grande station de Slovaquie dans les Basses-Tatras. Jasná accueille régulièrement des manches de Coupe du Monde de ski alpin féminin. Le parc national des Basses-Tatras protège les loups, lynx et ours bruns qui vivent autour des pistes. La Slovaquie a rejoint l'UE en 2004 — Jasná est devenue depuis une destination prisée des skieurs tchèques et autrichiens."},
+// ── CZECH REPUBLIC ─────────────────────────────────────
+{id:830,name:"Špindlerův Mlýn",    region:"Tchéquie", massif:"Monts des Géants", alt:1602, lat:50.73, lon:15.61,
+ open:"Déc", created:1929, domain:"25 km de pistes", anecdote:"La plus grande station de République tchèque dans les Krkonoše (Monts des Géants), parc national à la frontière polonaise. La légende du Géant Krakonoš, esprit de la montagne protecteur mais capricieux, est omniprésente dans le folklore local. Les pluies acides des années 80-90 ont dévasté les forêts — les épicéas morts dressent encore leurs silhouettes fantomatiques."},
+// ── HONGRIE ────────────────────────────────────────────
+{id:840,name:"Mátraháza",          region:"Hongrie", massif:"Mátra", alt:1015, lat:47.87, lon:19.98,
+ open:"Déc", created:1955, domain:"10 km de pistes", anecdote:"Le point culminant de Hongrie à 1015m — le pays est si plat que ces collines sont considérées comme de 'vraies montagnes'. Mátraháza est la seule station de ski de Hongrie. Les Hongrois ont une relation particulière avec leurs 'montagnes' — le Kékes (1014m) est le Everest national."},
+// ── PORTUGAL ───────────────────────────────────────────
+{id:850,name:"Serra da Estrela",   region:"Portugal", massif:"Serra da Estrela", alt:1993, lat:40.32, lon:-7.61,
+ open:"Jan", created:1955, domain:"10 km de pistes", anecdote:"La seule station de ski du Portugal continental, au sommet de la Serra da Estrela (1993m), le toit du Portugal. La neige est imprévisible et la saison courte — parfois seulement 2-3 semaines par an. Les fromages da Estrela, affinés dans les bergeries d'altitude, sont les meilleurs du Portugal. Vue sur l'Espagne par temps clair."},
+// ── LUXEMBOURG ─────────────────────────────────────────
+{id:860,name:"Hautcharage",        region:"Luxembourg", massif:"Ardennes lux.", alt:400, lat:49.56, lon:5.93,
+ open:"Jan", created:1980, domain:"2 pistes", anecdote:"La seule et unique piste de ski du Luxembourg — une piste de 300m avec 30m de dénivelé dans les Ardennes luxembourgeoises. Ouverte seulement quand il neige naturellement, ce qui arrive environ 5-10 jours par an. Une curiosité géographique absolue : le pays le plus plat d'Europe centrale qui ose afficher une 'station de ski'."},
+// ── ECOSSE SUPPLÉMENTAIRES ─────────────────────────────
+{id:870,name:"Nevis Range",        region:"Écosse", massif:"Ben Nevis", alt:1221, lat:56.81, lon:-4.97,
+ open:"Déc", created:1989, domain:"35 km de pistes", anecdote:"Au pied du Ben Nevis (1345m), le plus haut sommet des îles britanniques. La télécabine Nevis Range est la seule télécabine de montagne d'Écosse. Le circuit de VTT de descente est classé parmi les 10 meilleurs d'Europe en été. Par temps clair, on aperçoit les îles Hébrides depuis le sommet."},
+// ── ALPES DU NORD SUPPLÉMENTAIRES ──────────────────────
+{id:880,name:"La Clusaz",          region:"Alpes du Nord", massif:"Aravis", alt:2600, lat:45.90, lon:6.42,
+ open:"Déc", created:1907, domain:"132 km de pistes", anecdote:"L'une des premières stations françaises, fondée en 1907 par des paysans savoyard visionnaires. La Clusaz a conservé son caractère de village authentique — ses vaches, ses fermes et son église baroque du 17ème coexistent avec les remontées. Le reblochon fermier de la Vallée des Aravis est le meilleur de Savoie."},
+{id:881,name:"Le Grand-Bornand",   region:"Alpes du Nord", massif:"Aravis", alt:2100, lat:45.94, lon:6.44,
+ open:"Déc", created:1947, domain:"90 km de pistes", anecdote:"Village savoyard authentique qui a refusé le modèle des stations intégrées pour préserver son caractère agricole. Le Grand-Bornand accueille chaque janvier la Grand-Prix de Biathlon, l'une des plus grandes compétitions de biathlon au monde avec 25 000 spectateurs. Les fromages d'alpage (Reblochon, Abondance) sont affinés dans des caves du village."},
+{id:882,name:"Flaine",             region:"Alpes du Nord", massif:"Grand Massif", alt:2500, lat:45.99, lon:6.68,
+ open:"Déc", created:1969, domain:"265 km (Grand Massif)", anecdote:"Station d'architecture brutaliste radicale conçue par Marcel Breuer en 1969 — béton brut, formes géométriques pures. Classée patrimoine architectural du 20ème siècle. Des œuvres de Picasso, Vasarely et Dubuffet ornent les espaces publics. Une des plus hautes stations des Alpes en altitude moyenne — neige garantie."},
+// ── ALPES DU SUD SUPPLÉMENTAIRES ──────────────────────
+{id:890,name:"Auron",              region:"Alpes du Sud", massif:"Mercantour", alt:2450, lat:44.20, lon:6.98,
+ open:"Déc", created:1936, domain:"135 km de pistes", anecdote:"Sur les contreforts du parc national du Mercantour à 90km de Nice — on peut skier le matin et dîner sur la Promenade des Anglais le soir. La Chapelle Saint-Erige, datant du 11ème siècle, trône au cœur de la station depuis un millénaire, bien avant l'invention du ski."},
+{id:891,name:"Isola 2000",         region:"Alpes du Sud", massif:"Mercantour", alt:2610, lat:44.19, lon:7.08,
+ open:"Déc", created:1971, domain:"120 km de pistes", anecdote:"La station la plus ensoleillée des Alpes du Sud — plus de 300 jours de soleil par an dans la vallée de la Tinée. À seulement 90km de Nice et 20km de la frontière italienne. Vue sur la Méditerranée depuis le sommet par temps clair. Les loups du Mercantour ont été réintroduits en 1992 — ils rôdent parfois aux abords de la station."},
+// ── ALPES DU NORD NOUVEAUX ─────────────────────────────
+{id:900,name:"Avoriaz",            region:"Alpes du Nord", massif:"Portes du Soleil", alt:2466, lat:46.19, lon:6.77,
+ open:"Déc", created:1966, domain:"600 km (Portes du Soleil)", anecdote:"Station entièrement piétonne perchée sur un éperon rocheux à 1800m — seuls les chevaux et les dameuses circulent dans le village. Les bâtiments en bois sculpté de Jacques Labro, lauréats de prix d'architecture, sont si bien intégrés qu'Avoriaz ressemble à un village d'altitude naturel. La Suisse est accessible à ski sans remonter dans une voiture."},
+{id:901,name:"Morillon",           region:"Alpes du Nord", massif:"Grand Massif", alt:1750, lat:46.06, lon:6.70,
+ open:"Déc", created:1968, domain:"265 km (Grand Massif)", anecdote:"Village savoyard authentique au pied du Grand Massif, relié à Flaine et Samoëns sans voiture. Morillon a conservé son caractère agricole — les chalets et greniers du 17ème siècle coexistent avec les remontées. Les fromages d'alpage du val du Giffre, dont l'Abondance, sont affinés dans les caves du village depuis le Moyen Âge."},
+{id:902,name:"Samoëns",            region:"Alpes du Nord", massif:"Grand Massif", alt:2480, lat:46.08, lon:6.72,
+ open:"Déc", created:1969, domain:"265 km (Grand Massif)", anecdote:"Village médiéval classé parmi les plus beaux villages de France avec sa grande fontaine du 16ème siècle et son église romane. Les 'Géginots' de Samoëns — tailleurs de pierre célèbres dans toute l'Europe — ont bâti des édifices jusqu'à Paris et Lyon. La Jaÿsinia, jardin botanique alpin créé en 1906 par Marie-Louise Cognacq, contient 5000 espèces."},
+{id:903,name:"Les Contamines",     region:"Alpes du Nord", massif:"Mont-Blanc", alt:2487, lat:45.82, lon:6.73,
+ open:"Déc", created:1946, domain:"225 km (Évasion MB)", anecdote:"Au cœur du domaine Évasion Mont-Blanc, Les Contamines est la station la plus préservée du massif — pas d'immeubles, que des chalets. L'église Notre-Dame de la Gorge, baroque du 17ème siècle au fond d'une gorge spectaculaire, est un des joyaux de l'art religieux savoyard. Point de départ de la traversée du Mont-Blanc."},
+{id:904,name:"Praz-sur-Arly",      region:"Alpes du Nord", massif:"Aravis", alt:1800, lat:45.83, lon:6.57,
+ open:"Déc", created:1937, domain:"50 km de pistes", anecdote:"Petit village savoyard authentique resté à l'écart des grands domaines. Vue directe sur le Mont-Blanc depuis les pistes. Le marché hebdomadaire de Praz-sur-Arly, avec ses fromagers et ses charcutiers savoyards, est l'un des marchés alpins les plus authentiques de Haute-Savoie. Idéal pour les familles cherchant l'anti-station de luxe."},
+// ── SUISSE NOUVEAUX ────────────────────────────────────
+{id:910,name:"Anzère",             region:"Suisse", massif:"Valais", alt:2420, lat:46.30, lon:7.40,
+ open:"Déc", created:1963, domain:"55 km de pistes", anecdote:"Perché à 1500m face au val d'Hérens, Anzère est un balcon ensoleillé sur le Valais avec vue sur les 4000m des Alpes bernoises. Station familiale qui a su rester à taille humaine. Le village préserve les 'mazots' (greniers à foin valaisans sur pilotis) qui donnent au village un caractère unique parmi les stations suisses."},
+{id:911,name:"Champéry",           region:"Suisse", massif:"Portes du Soleil", alt:2466, lat:46.18, lon:6.87,
+ open:"Déc", created:1908, domain:"600 km (Portes du Soleil)", anecdote:"Village valaisan pittoresque avec son clocher baroque du 18ème siècle, côté suisse des Portes du Soleil. Le Wall — une barre rocheuse de 700m franchissable seulement par les skieurs experts — est l'un des passages ski les plus intimidants d'Europe. Pour rentrer en Suisse depuis la France, il faut soit l'emprunter soit prendre un bus."},
+{id:912,name:"Nendaz",             region:"Suisse", massif:"4 Vallées", alt:3330, lat:46.19, lon:7.31,
+ open:"Nov", created:1965, domain:"410 km (4 Vallées)", anecdote:"Partie du plus grand domaine skiable de Suisse — les 4 Vallées comprenant Verbier, Savoleyres, Veysonnaz et Thyon. Le mont Gelé (3023m) accessible depuis Nendaz offre un panorama sur plus de 50 sommets de 4000m. Village valaisan typique avec ses bisses (canaux d'irrigation médiévaux) encore fonctionnels en été."},
+{id:913,name:"Bettmeralp",         region:"Suisse", massif:"Valais", alt:2869, lat:46.39, lon:8.07,
+ open:"Déc", created:1958, domain:"100 km (Aletsch Arena)", anecdote:"Au bord du glacier d'Aletsch — le plus grand glacier des Alpes (23km de long, 900m d'épaisseur), classé UNESCO. Village entièrement sans voiture, accessible uniquement par téléphérique depuis la vallée. Vue sur le glacier depuis les pistes — une des plus belles expériences visuelles du ski alpin mondial."},
+// ── AUTRICHE NOUVEAUX ─────────────────────────────────
+{id:920,name:"Sölden",             region:"Autriche", massif:"Ötztal", alt:3340, lat:46.97, lon:11.00,
+ open:"Oct", created:1948, domain:"144 km de pistes", anecdote:"Deux glaciers skiables dès octobre — Rettenbach et Tiefenbach, à 3250m d'altitude. Le restaurant Ian Fleming's, construit dans un cube de verre au sommet de l'Isskogel, était le décor du film James Bond Spectre (2015). La coupe du monde d'ouverture de saison s'y tient chaque octobre depuis 1992 — coup d'envoi officiel du ski mondial."},
+{id:921,name:"Hintertux",          region:"Autriche", massif:"Zillertal", alt:3250, lat:47.05, lon:11.67,
+ open:"Toute l'année", created:1966, domain:"60 km (glacier)", anecdote:"L'unique station d'Europe ouverte 365 jours par an — le glacier de Hintertux ne ferme jamais. En août, on ski en maillot de bain sous le soleil. L'équipe de France y prépare sa saison chaque automne. Le village de Hintertux, niché au fond du Zillertal, est l'un des rares villages autrichiens sans résidences secondaires — que des locaux."},
+{id:922,name:"Hochgurgl",          region:"Autriche", massif:"Ötztal", alt:3082, lat:46.87, lon:10.97,
+ open:"Nov", created:1952, domain:"110 km (Obergurgl-Hochgurgl)", anecdote:"La station habitée la plus haute d'Autriche avec son unique hôtel-village. Obergurgl-Hochgurgl est réputée pour sa garantie d'enneigement absolu — jamais de fermeture pour manque de neige en 70 ans d'histoire. Edmund Hillary s'y est arrêté lors de sa descente triomphale après l'Everest en 1953."},
+{id:923,name:"Ellmau",             region:"Autriche", massif:"SkiWelt Wilder Kaiser", alt:1957, lat:47.52, lon:12.30,
+ open:"Déc", created:1963, domain:"284 km (SkiWelt)", anecdote:"Le SkiWelt Wilder Kaiser est l'un des 10 plus grands domaines d'Europe avec 284 km de pistes. Le Kaiser, chaîne de calcaire aux parois verticales spectaculaires, est le décor de carte postale tyrolien par excellence. Le village d'Ellmau a conservé ses fermes et ses chapelles baroques — l'Autriche rurale authentique à quelques minutes des pistes."},
+// ── ITALIE NOUVEAUX ────────────────────────────────────
+{id:930,name:"Passo Tonale",       region:"Italie", massif:"Trentino", alt:3016, lat:46.26, lon:10.58,
+ open:"Nov", created:1950, domain:"100 km de pistes + glacier", anecdote:"Sur le col du Tonale à 1883m, sur les traces de la Première Guerre mondiale — les tranchées austro-hongroises et italiennes sont encore visibles dans la montagne. Le glacier du Presena (3016m) permet le ski d'été. Un musée de la Grande Guerre est intégré dans la station — les soldats skieurs de 1915 ont inventé ici les techniques du ski de montagne moderne."},
+{id:931,name:"Arabba",             region:"Italie", massif:"Dolomites", alt:2950, lat:46.50, lon:11.87,
+ open:"Déc", created:1955, domain:"1200 km (Dolomiti Superski)", anecdote:"Porte d'entrée du légendaire Sella Ronda — le tour des Dolomites à ski en une journée. Arabba possède les pistes les plus difficiles des Dolomites avec ses noires réputées parmi les plus techniques d'Italie. Le Porta Vescovo (2478m) offre un panorama sur la Marmolada (3342m), le toit des Dolomites et son glacier en recul visible chaque année."},
+{id:932,name:"Selva di Val Gardena",region:"Italie", massif:"Dolomites", alt:2519, lat:46.56, lon:11.77,
+ open:"Déc", created:1935, domain:"175 km + Sella Ronda", anecdote:"Point de départ idéal du Sella Ronda — le tour des quatre cols dolomitiques à ski. La communauté ladin de Val Gardena, qui parle une langue romane unique survivante, sculpte le bois depuis le 17ème siècle — les ateliers de sculpture sont visibles dans tout le village. La Ciampinoi (2254m) accueille une descente de Coupe du Monde chaque décembre."},
+{id:933,name:"Canazei",            region:"Italie", massif:"Dolomites", alt:2950, lat:46.48, lon:11.77,
+ open:"Déc", created:1948, domain:"1200 km (Dolomiti Superski)", anecdote:"Au pied de la Marmolada (3342m), le plus haut sommet des Dolomites et dernier grand glacier du massif. En 2022, un sérac de 200 000 tonnes s'est détaché de la Marmolada et a tué 11 randonneurs — signe dramatique du réchauffement climatique sur les Alpes. Le village ladino de Canazei est classé parmi les plus beaux d'Italie."},
+// ── PYRÉNÉES NOUVEAUX ─────────────────────────────────
+{id:940,name:"Luz-Ardiden",        region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2500, lat:42.87, lon:-0.04,
+ open:"Déc", created:1972, domain:"80 km de pistes", anecdote:"Surplombant Luz-Saint-Sauveur et ses thermes napoléoniens visités par Napoléon III et l'Impératrice Eugénie. Luz-Ardiden est l'arrivée d'une étape mythique du Tour de France — les grimpeurs y souffrent chaque juillet là où les skieurs glissent en hiver. Vue sur le pic du Midi de Bigorre et son observatoire depuis les pistes."},
+{id:941,name:"Peyragudes",         region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2400, lat:42.79, lon:0.43,
+ open:"Déc", created:1970, domain:"65 km de pistes", anecdote:"Fusion de deux stations (Peyresourde et Les Agudes) séparées par une crête — on passe d'un versant à l'autre en quelques coups de bâton. Arrivée plusieurs fois du Tour de France sur le col de Peyresourde. Les ours bruns des Pyrénées — réintroduits en 1996 et encore controversés — sont présents dans les forêts du versant espagnol visible depuis les pistes."},
+{id:942,name:"Val Louron",         region:"Pyrénées", massif:"Hautes-Pyrénées", alt:2100, lat:42.79, lon:0.42,
+ open:"Déc", created:1988, domain:"40 km de pistes", anecdote:"Station récente construite au-dessus du lac de Génos-Loudenvielle, retenue artificielle turquoise visible depuis les pistes. Voisine de Peyragudes dans la vallée du Louron. Les villages de la vallée, avec leurs granges à ossature bois du 16ème siècle, sont parmi les mieux préservés des Pyrénées centrales françaises."},
+{id:943,name:"Font Romeu",         region:"Pyrénées", massif:"Pyrénées-Orientales", alt:2213, lat:42.50, lon:2.05,
+ open:"Déc", created:1921, domain:"40 km de pistes", anecdote:"Station solaire par excellence — 3000 heures de soleil par an font de Font Romeu l'une des stations les plus lumineuses de France. Le centre de préparation olympique attire les athlètes du monde entier pour l'entraînement en altitude. Le four solaire d'Odeillo, à 2km, est le plus puissant du monde avec ses 10 000 miroirs paraboliques."},
+// ── ESPAGNE NOUVEAUX ──────────────────────────────────
+{id:950,name:"Formigal",           region:"Espagne", massif:"Pyrénées espagnoles", alt:2250, lat:42.78, lon:-0.35,
+ open:"Nov", created:1963, domain:"137 km de pistes", anecdote:"La plus grande station d'Espagne avec 137 km de pistes dans la vallée de Tena. Le col du Portalet, à 5km, est la frontière franco-espagnole — des réfugiés républicains espagnols l'ont franchi à pied sous la neige en 1939. Les vautours fauves — colonie de 200 individus — planent en permanence au-dessus des pistes."},
+{id:951,name:"Panticosa",          region:"Espagne", massif:"Pyrénées espagnoles", alt:2200, lat:42.73, lon:-0.28,
+ open:"Déc", created:1965, domain:"35 km de pistes", anecdote:"Station thermale depuis les Romains — les thermes de Panticosa sont mentionnés par Pline l'Ancien au 1er siècle. Le balneario (station thermale) historique du 19ème siècle, construit dans un cirque glaciaire spectaculaire, est un chef-d'œuvre de l'architecture néoclassique espagnole. Les isards (chamois pyrénéens) sont fréquemment visibles depuis les pistes."},
+// ── SCANDINAVIE NOUVEAUX ──────────────────────────────
+{id:960,name:"Voss",               region:"Norvège", massif:"Vestland", alt:945, lat:60.63, lon:6.41,
+ open:"Déc", created:1955, domain:"40 km de pistes", anecdote:"Capitale mondiale des sports extrêmes — Voss accueille chaque été l'Ekstremsportveko, le plus grand festival de sports extrêmes au monde. En hiver, les mêmes falaises deviennent des pistes de ski. Train direct depuis Bergen en 1h. Le fjord de Voss, visible depuis les sommets, est l'un des plus spectaculaires de Norvège."},
+{id:961,name:"Oppdal",             region:"Norvège", massif:"Trøndelag", alt:1245, lat:62.59, lon:9.69,
+ open:"Nov", created:1952, domain:"65 km de pistes", anecdote:"La plus grande station de Norvège centrale, à mi-chemin entre Oslo et Trondheim. Oppdal est au carrefour de trois vallées glaciaires — les fjells (hauts plateaux) environnants sont parcourus par les rennes sauvages de la tribu Sami de Røros. La lumière hivernale de la Norvège centrale, entre aurore et nuit polaire, crée des ambiances photographiques uniques."},
+{id:962,name:"Kvitfjell",          region:"Norvège", massif:"Innlandet", alt:1028, lat:61.48, lon:10.12,
+ open:"Nov", created:1993, domain:"35 km de pistes", anecdote:"Construite spécifiquement pour les JO de Lillehammer 1994 — les épreuves de descente et super-G s'y sont déroulées. La piste olympique de 3,2 km est encore utilisée pour les entraînements de Coupe du Monde. Bjørn Dæhlie, le plus grand skieur de fond de l'histoire, s'entraînait dans ces forêts de bouleaux norvégiens."},
+{id:963,name:"Idre Fjäll",         region:"Suède", massif:"Dalarna nord", alt:943, lat:61.87, lon:12.74,
+ open:"Nov", created:1963, domain:"40 km de pistes", anecdote:"La station la plus septentrionale de Suède, à 400km au nord de Stockholm dans les forêts de Dalécarlie. La région d'Idre est le territoire traditionnel de la tribu Sami suédoise — les éleveurs de rennes Sami passent encore leurs migrations annuelles à travers la station. Les aurores boréales illuminent le ciel d'octobre à mars."},
+{id:964,name:"Vemdalen",           region:"Suède", massif:"Härjedalen", alt:940, lat:62.45, lon:13.87,
+ open:"Nov", created:1958, domain:"110 km (Skistar Vemdalen)", anecdote:"Dans les montagnes de Härjedalen, région la moins densément peuplée de Suède. Vemdalen a été préservé du tourisme de masse — les forêts de bouleaux nains et les lacs gelés créent un paysage de pure Scandinavie. Le village de Hede, à 15 minutes, abrite un musée Sami unique sur la culture de l'élevage de rennes."},
+// ── ALASKA ET CANADA NOUVEAUX ─────────────────────────
+{id:970,name:"Alyeska",            region:"États-Unis", massif:"Alaska", alt:1194, lat:60.97, lon:-149.10,
+ open:"Nov", created:1960, domain:"490 ha de pistes", anecdote:"La seule grande station de ski d'Alaska, à 60km d'Anchorage. Alyeska reçoit jusqu'à 18m de neige par an — parmi les plus fortes précipitations neigeuses des États-Unis. Les baleines et orques dans le fjord de Turnagain Arm sont visibles depuis le téléphérique. Les ours noirs traversent parfois les pistes en début et fin de saison."},
+{id:971,name:"Whitefish Mountain", region:"États-Unis", massif:"Montana Rockies", alt:2093, lat:48.49, lon:-114.35,
+ open:"Nov", created:1947, domain:"750 ha de pistes", anecdote:"Au bord du Glacier National Park — l'un des plus beaux parcs naturels des États-Unis. Les glaciers du parc, qui étaient 150 en 1910, ne sont plus que 25 aujourd'hui — document vivant du réchauffement climatique. Le lac Whitefish gelé en contrebas et les forêts de mélèzes enneigés créent un décor de carte postale du Grand Ouest américain."},
+{id:972,name:"Red Mountain",       region:"Canada", massif:"Colombie-Britannique", alt:2077, lat:49.10, lon:-117.80,
+ open:"Nov", created:1947, domain:"1682 ha de pistes", anecdote:"La station la mieux gardée de Colombie-Britannique — les locaux de Rossland l'ont longtemps cachée aux touristes. Red Mountain a produit plus de champions olympiques de ski alpin par habitant que n'importe quelle ville au monde — Nancy Greene (or JO 1968) en est l'enfant la plus célèbre. La neige légère des Selkirks y arrive tôt et reste tard."},
+{id:973,name:"Kicking Horse",      region:"Canada", massif:"Colombie-Britannique", alt:2450, lat:51.30, lon:-116.98,
+ open:"Nov", created:2000, domain:"2825 ha de pistes", anecdote:"Nommée d'après l'incident de 1858 où l'explorateur James Hector fut mis KO par un coup de sabot de cheval — ses compagnons, le croyant mort, commencèrent à l'enterrer avant qu'il ne se réveille. Le dénivelé de 1260m est parmi les plus grands du Canada. Les loups, ours grizzlis et wapitis sont régulièrement aperçus depuis les télécabines."},
+{id:974,name:"Panorama",           region:"Canada", massif:"Colombie-Britannique", alt:2845, lat:50.46, lon:-116.23,
+ open:"Nov", created:1962, domain:"2975 ha de pistes", anecdote:"Dans les Purcell Mountains, chaîne parallèle aux Rocheuses canadiennes. Le dénivelé de 1814m est le deuxième du Canada. Les sources chaudes naturelles de Panorama — découvertes par les premiers chercheurs d'or dans les années 1880 — alimentent encore les piscines thermales de la station. Vue sur les Rocheuses et les Purcells sur 360°."},
+// ── AMÉRIQUE DU SUD NOUVEAUX ──────────────────────────
+{id:980,name:"El Colorado",        region:"Chili", massif:"Andes chiliennes", alt:3333, lat:-33.35, lon:-70.30,
+ open:"Juin", created:1936, domain:"26 km de pistes", anecdote:"La station la plus ancienne du Chili, fondée en 1936 par la communauté britannique de Santiago. El Colorado est la seule station du monde où l'on peut voir simultanément le Pacifique et les Andes à 6000m depuis les pistes par temps clair. La neige andine, ultra-sèche grâce au désert d'Atacama tout proche, est parmi les plus légères du monde."},
+{id:981,name:"Farellones",         region:"Chili", massif:"Andes chiliennes", alt:3000, lat:-33.35, lon:-70.32,
+ open:"Juin", created:1930, domain:"15 km de pistes", anecdote:"Le berceau du ski chilien — la première piste du pays y fut tracée en 1930 par des ingénieurs allemands travaillant sur les mines de cuivre. Village de montagne pittoresque avec ses chalets colorés aux styles architecturaux mélangés. Seule station au monde où l'on entend parfois les condors des Andes planer silencieusement au-dessus des pistes."},
+{id:982,name:"Chapa Verde",        region:"Chili", massif:"Andes centrales", alt:2430, lat:-34.18, lon:-70.50,
+ open:"Juin", created:1943, domain:"25 km de pistes", anecdote:"Station minière transformée en station de ski — propriété de la compagnie minière Codelco (cuivre). Les mineurs de la région ont créé leurs propres pistes dans les années 40 pour se divertir l'hiver. Aujourd'hui ouverte au public mais encore gérée par Codelco. Les condors font leurs nids dans les falaises au-dessus des pistes."},
+{id:983,name:"Bariloche (Catedral)",region:"Argentine", massif:"Patagonie", alt:2388, lat:-41.18, lon:-71.49,
+ open:"Juin", created:1938, domain:"130 km de pistes", anecdote:"La plus grande station d'Argentine, au bord du lac Nahuel Huapi en Patagonie. Bariloche est surnommée la 'Suisse argentine' — ses immigrants suisses et allemands du 19ème siècle ont construit des chalets et des chocolateries qui dépaysent complètement. Le parc national Nahuel Huapi, avec ses condors et pumas, encadre les pistes."},
+// ── ASIE CENTRALE NOUVEAUX ────────────────────────────
+{id:990,name:"Chimgan",            region:"Ouzbékistan", massif:"Tian Shan occidental", alt:3309, lat:41.56, lon:70.04,
+ open:"Déc", created:1935, domain:"15 km de pistes", anecdote:"La seule station de ski d'Ouzbékistan, dans les contreforts du Tian Shan à 80km de Tachkent. Construite par les Soviétiques en 1935, Chimgan était la station de villégiature préférée de l'élite soviétique d'Asie centrale. La Route de la Soie passait à quelques kilomètres — les caravansérails de Marco Polo sont visibles dans la vallée."},
+{id:991,name:"Amirsoy",            region:"Ouzbékistan", massif:"Tian Shan occidental", alt:2400, lat:41.60, lon:70.10,
+ open:"Déc", created:2019, domain:"15 km de pistes", anecdote:"Station ultra-moderne inaugurée en 2019 par le président ouzbek Mirziyoyev pour moderniser le tourisme de montagne. Amirsoy est le symbole de la nouvelle Ouzbékistan post-soviétique — investissements massifs, infrastructures européennes, ambitions internationales. Les tulipes sauvages d'Ouzbékistan, ancêtres de toutes les tulipes cultivées au monde, poussent dans les alpages voisins."},
+{id:992,name:"Chunkurchak",        region:"Kirghizstan", massif:"Tian Shan", alt:2200, lat:42.78, lon:74.72,
+ open:"Déc", created:1978, domain:"10 km de pistes", anecdote:"À 30km de Bichkek, capitale du Kirghizstan, dans les montagnes du Tian Shan. Station soviétique authentique avec ses télésièges d'époque et son ambiance d'avant 1991. Le Kirghizstan est un pays de nomades — les yourtes (habitations traditionnelles rondes) remplacent parfois les chalets dans les alpages d'été voisins."},
+// ── PACIFIQUE NOUVEAUX ────────────────────────────────
+{id:1000,name:"Mt Ruapehu (Whakapapa)",region:"Nouvelle-Zélande", massif:"Plateau volcanique", alt:2797, lat:-39.28, lon:175.57,
+ open:"Juin", created:1913, domain:"550 ha de pistes", anecdote:"Station sur un volcan actif — le mont Ruapehu (2797m) entre en éruption régulièrement, la dernière fois en 2007. Les pistes sont tracées sur les flancs d'un stratovolcan qui cache un lac de cratère acide au sommet à 80°C. Le Mordor du Seigneur des Anneaux a été filmé ici — les pentes désolées de Ruapehu sont celles de la Terre de l'Ombre."},
+{id:1001,name:"Mt Hutt",            region:"Nouvelle-Zélande", massif:"Canterbury", alt:2086, lat:-43.49, lon:171.55,
+ open:"Juin", created:1974, domain:"365 ha de pistes", anecdote:"La station avec la plus longue saison de Nouvelle-Zélande — parfois de mai à octobre. Vue spectaculaire sur la plaine de Canterbury et les Alpes du Sud depuis les pistes. L'île du Sud est le résultat de la collision entre les plaques australienne et pacifique — les Alpes du Sud sont des montagnes jeunes qui grandissent encore de 10mm par an."},
+// ── AFRIQUE NOUVEAUX ──────────────────────────────────
+{id:1010,name:"Ifrane",             region:"Maroc", massif:"Moyen Atlas", alt:1650, lat:33.53, lon:-5.11,
+ open:"Jan", created:1938, domain:"5 km de pistes", anecdote:"Ville suisse au Maroc — Ifrane a été construite par les Français en 1929 avec des chalets à toits pointus, des roses et des rues propres dans le Moyen Atlas. La forêt de cèdres d'Ifrane abrite la plus grande colonie de macaques de Barbarie d'Afrique du Nord — on les voit parfois sur les pistes. Les lionnes de l'Atlas (espèce éteinte à l'état sauvage) sont mythifiées dans la région."},
+// ── MOYEN-ORIENT NOUVEAUX ─────────────────────────────
+{id:1020,name:"Faraya Mzaar",       region:"Liban", massif:"Mont-Liban", alt:2465, lat:33.98, lon:35.69,
+ open:"Jan", created:1953, domain:"80 km de pistes", anecdote:"Jumelle de Mzaar Kfardebian — ensemble elles forment le plus grand domaine du Liban. Le paradoxe libanais absolu : skier sous le soleil méditerranéen avec vue sur les palmiers de Beyrouth et la mer bleue. Les combattants phéniciens utilisaient ces cols pour leurs migrations saisonnières 3000 ans avant notre ère — histoire palpable sous la neige."},
+{id:1021,name:"The Cedars",         region:"Liban", massif:"Mont-Liban nord", alt:3088, lat:34.25, lon:36.05,
+ open:"Jan", created:1953, domain:"20 km de pistes", anecdote:"Entourée de la plus ancienne forêt de cèdres du monde — les Cèdres du Liban, mentionnés dans la Bible et l'Épopée de Gilgamesh (2700 av. J-C). Les cèdres géants de 1500 ans qui bordent les pistes sont protégés par décret royal depuis le Moyen Âge. Station la plus haute du Liban avec des conditions de ski surprenantes pour le Moyen-Orient."},
+// ── EUROPE DE L'EST NOUVEAUX ──────────────────────────
+{id:1030,name:"Białka Tatrzańska",  region:"Pologne", massif:"Tatras", alt:1288, lat:49.41, lon:20.12,
+ open:"Déc", created:1990, domain:"25 km de pistes", anecdote:"Village des Tatras polonaises réputé pour ses thermes — les 'Bania' et 'Termy Bania' sont parmi les plus grands parcs aquatiques thermaux d'Europe. Skier le matin et se baigner dans des bassins à 38°C face aux Tatras enneigées le soir — combinaison unique dans les Carpates. Le costume traditionnel des Gorales (highlanders polonais) se voit encore au marché."},
+{id:1031,name:"Štrbské Pleso",      region:"Slovaquie", massif:"Hautes-Tatras", alt:2190, lat:49.12, lon:20.06,
+ open:"Déc", created:1970, domain:"30 km de pistes", anecdote:"Au bord du lac glaciaire de Štrbské Pleso (1346m), symbole des Hautes-Tatras slovaques. Site des Championnats du Monde de ski nordique 1970 et 1978. Le Rysy (2499m), point culminant de Pologne ET de Slovaquie (la frontière passe au sommet), est visible depuis les pistes. Les lynx des Tatras, espèce protégée, traversent parfois les pistes en pleine nuit."},
+{id:1032,name:"Pec pod Sněžkou",    region:"Tchéquie", massif:"Monts des Géants", alt:1602, lat:50.69, lon:15.74,
+ open:"Déc", created:1931, domain:"25 km de pistes", anecdote:"Au pied de la Sněžka (1602m), le plus haut sommet de Tchéquie. La Sněžka est le sommet le plus venteux de République tchèque — les vents peuvent dépasser 200 km/h au sommet. L'observatoire météorologique au sommet, de style UFO, est une des architectures les plus reconnaissables d'Europe centrale. La frontière polono-tchèque passe exactement au sommet."},
+// ── ALPES DU NORD ─────────────────────────────────────
+{id:1100,name:"Notre-Dame-de-Bellecombe",region:"Alpes du Nord", massif:"Val d'Arly", alt:1900, lat:45.80, lon:6.53,
+ open:"Déc", created:1946, domain:"90 km (Espace Diamant)", anecdote:"Petit village savoyard typique avec son église baroque du 17ème siècle, intégré dans l'Espace Diamant. Vue directe sur le Mont-Blanc depuis les pistes. Le marché fermier hebdomadaire de Flumet, village voisin, est l'un des plus authentiques de Savoie — fromages, charcuteries et produits de montagne en direct des producteurs locaux."},
+{id:1101,name:"Combloux",           region:"Alpes du Nord", massif:"Mont-Blanc", alt:2000, lat:45.88, lon:6.64,
+ open:"Déc", created:1934, domain:"445 km (Évasion MB)", anecdote:"Surnommée le 'balcon du Mont-Blanc' — vue imprenable sur les 4810m depuis chaque piste. L'église de Combloux avec son clocher bulbe doré est l'une des plus photographiées de Savoie. Station familiale qui a résisté au gigantisme des domaines voisins — les fermes et les fruitières fromagères coexistent avec les remontées depuis 90 ans."},
+{id:1102,name:"Saint-Nicolas-de-Véroce",region:"Alpes du Nord", massif:"Mont-Blanc", alt:1850, lat:45.87, lon:6.72,
+ open:"Déc", created:1963, domain:"445 km (Évasion MB)", anecdote:"Village d'altitude perché à 1150m dans le massif du Mont-Blanc. L'église baroque du 18ème siècle renferme un trésor d'orfèvrerie parmi les plus riches de Savoie. Les guides de haute montagne du village ont ouvert les premières voies d'ascension du Mont-Blanc au 18ème siècle — leurs descendants guident encore les alpinistes aujourd'hui."},
+{id:1103,name:"Les Saisies",        region:"Alpes du Nord", massif:"Beaufortain", alt:2069, lat:45.75, lon:6.53,
+ open:"Déc", created:1963, domain:"154 km de pistes", anecdote:"Station natale de Frank Piccard, champion olympique de super-G à Calgary 1988. Les Saisies est le paradis du ski de fond avec 110 km de pistes nordiques tracées sur le plateau du Beaufortain — le pays du Beaufort, fromage roi des Alpes. Les troupeaux de vaches Tarines qui produisent le lait à Beaufort paissent à 1800m en été."},
+{id:1104,name:"Pralognan-la-Vanoise",region:"Alpes du Nord", massif:"Vanoise", alt:2952, lat:45.38, lon:6.72,
+ open:"Déc", created:1955, domain:"25 km de pistes", anecdote:"Porte d'entrée du parc national de la Vanoise, premier parc national de France créé en 1963. Le glacier de la Vanoise et ses 107 espèces d'oiseaux protégées entourent les pistes. Station volontairement petite et préservée — les habitants ont refusé l'extension du domaine pour protéger le parc. Les bouquetins du parc descendent parfois jusqu'aux pistes."},
+{id:1105,name:"Valloire",           region:"Alpes du Nord", massif:"Galibier-Thabor", alt:2600, lat:45.17, lon:6.43,
+ open:"Déc", created:1935, domain:"150 km de pistes", anecdote:"Au pied du col du Galibier (2642m), mythe du Tour de France — le col le plus haut et le plus craint des cyclistse. En hiver les pistes remplacent la route. L'église baroque du 17ème siècle de Valloire, avec ses 60 tableaux et sculptures, est classée monument historique et constitue l'un des plus beaux ensembles baroques des Alpes françaises."},
+// ── SUISSE ────────────────────────────────────────────
+{id:1110,name:"Grindelwald",        region:"Suisse", massif:"Oberland bernois", alt:3454, lat:46.62, lon:8.04,
+ open:"Nov", created:1891, domain:"213 km (Jungfrau Region)", anecdote:"Au pied de l'Eiger (3970m) et sa légendaire face nord — la Mordwand (muraille de la mort) — première vaincue en 1938 par Anderl Heckmair. La Jungfraubahn, train à crémaillère inauguré en 1912 montant jusqu'à 3454m, est classée patrimoine mondial UNESCO. Vue sur 20 sommets de 4000m depuis les pistes du Männlichen."},
+{id:1111,name:"Mürren",             region:"Suisse", massif:"Oberland bernois", alt:2970, lat:46.56, lon:7.89,
+ open:"Déc", created:1910, domain:"213 km (Jungfrau Region)", anecdote:"Village sans route ni voiture, accessible uniquement par téléphérique ou train à crémaillère. Vue frontale sur la Jungfrau (4158m), le Mönch et l'Eiger depuis le village perché à 1650m. La descente de Lauberhorn à Wengen voisine est la plus longue descente du Monde de ski alpin (4480m). Ian Fleming a inventé James Bond ici."},
+{id:1112,name:"Lenzerheide",        region:"Suisse", massif:"Grisons", alt:2865, lat:46.73, lon:9.56,
+ open:"Déc", created:1945, domain:"155 km de pistes", anecdote:"Station favorite des Zurichois à 1h30 de la ville. Lenzerheide accueille depuis 2014 une manche de Coupe du Monde de ski alpin — les pistes techniques de Rothorn conviennent parfaitement aux slaloms. Le plateau de Lenzerheide, large et ensoleillé, est aussi l'un des plus beaux parcours de VTT d'Europe en été."},
+{id:1113,name:"Flims Laax",         region:"Suisse", massif:"Grisons", alt:3018, lat:46.84, lon:9.24,
+ open:"Oct", created:1956, domain:"235 km de pistes", anecdote:"Le snowpark de Laax est le meilleur d'Europe — les Championnats du Monde de snowboard halfpipe s'y déroulent. Le glacier du Vorab (3018m) permet le ski dès octobre. La Fopi, forêt de pins arole multicentenaire classée réserve naturelle, borde les pistes — les épicéas y ont été ravagés par les tempêtes de 1990 mais la forêt repousse naturellement."},
+{id:1114,name:"Engelberg",          region:"Suisse", massif:"Uri", alt:3020, lat:46.82, lon:8.41,
+ open:"Nov", created:1927, domain:"82 km de pistes", anecdote:"Au pied du Titlis (3238m) et son glacier — le seul glacier rotatif d'Europe avec sa télécabine pivotante à 360°. Le monastère bénédictin d'Engelberg, fondé en 1120, est encore habité par des moines qui produisent des fromages et des liqueurs. Le tunnel de glace et la falaise de glace du Titlis sont les attractions les plus visitées de Suisse centrale."},
+// ── AUTRICHE ──────────────────────────────────────────
+{id:1120,name:"Lech",               region:"Autriche", massif:"Vorarlberg Arlberg", alt:2811, lat:47.21, lon:10.14,
+ open:"Déc", created:1936, domain:"305 km (Ski Arlberg)", anecdote:"La station la plus chic d'Autriche — Diana de Galles, la reine Beatrix des Pays-Bas et la famille royale d'Angleterre y séjournaient régulièrement. La neige de Lech, réputée parmi les meilleures des Alpes, est apportée par les perturbations atlantiques bloquées par les contreforts du Vorarlberg. Le village médiéval est classé patrimoine architectural autrichien."},
+{id:1121,name:"Zürs",               region:"Autriche", massif:"Vorarlberg Arlberg", alt:2444, lat:47.17, lon:10.17,
+ open:"Déc", created:1906, domain:"305 km (Ski Arlberg)", anecdote:"La plus ancienne station organisée d'Autriche, fondée en 1906. Le Flexenpass (1773m) est l'un des cols les plus avalancheux d'Europe — des canons à avalanches déclenchent les coulées chaque nuit en hiver. Zürs ne compte que 100 habitants permanents mais 5000 lits — ratio unique en Europe. Hôtels 5 étoiles et cabanes rustiques se côtoient."},
+{id:1122,name:"Mayrhofen",          region:"Autriche", massif:"Zillertal", alt:2500, lat:47.17, lon:11.87,
+ open:"Nov", created:1950, domain:"630 km (Zillertal Arena)", anecdote:"La station la plus fréquentée du Zillertal et l'une des plus festives d'Autriche — les après-skis de Mayrhofen sont légendaires dans toute l'Europe. La Harakiri, avec ses 78% de pente, est la piste la plus raide d'Autriche. Le Penken (2095m) est accessible par la plus grande cabine téléphérique d'Autriche (150 personnes)."},
+{id:1123,name:"Obertauern",         region:"Autriche", massif:"Salzburger Land", alt:2313, lat:47.25, lon:13.56,
+ open:"Nov", created:1948, domain:"100 km de pistes", anecdote:"Station la plus enneigée d'Autriche avec une garantie de neige de novembre à mai. Sur le col de Tauern (1738m), ancien passage de la Via Salaria romaine transportant le sel. Les Beatles ont filmé le clip de 'Help!' et une partie du film éponyme à Obertauern en 1965 — les pentes autrichiennes ont inspiré leur période psychédélique."},
+{id:1124,name:"Schladming",         region:"Autriche", massif:"Styrie", alt:2015, lat:47.39, lon:13.69,
+ open:"Déc", created:1955, domain:"230 km (Ski amadé)", anecdote:"Ville de 4000 habitants qui a accueilli deux fois les Championnats du Monde (1982 et 2013) — la Planai est l'une des pistes de nuit les plus spectaculaires au monde lors de la slalom nocturne annuel devant 50 000 spectateurs. Les mines d'argent médiévales de Schladming ont financé une partie de l'Empire des Habsbourg au 16ème siècle."},
+// ── ITALIE ────────────────────────────────────────────
+{id:1130,name:"Livigno",            region:"Italie", massif:"Haute Valteline", alt:3002, lat:46.54, lon:10.14,
+ open:"Nov", created:1960, domain:"115 km de pistes", anecdote:"Enclave fiscale italienne — Livigno est hors taxes depuis le 16ème siècle par décret napoléonien, ce qui en fait le paradis du shopping duty-free des Alpes. Altitude moyenne de 1816m garantissant une neige de qualité tout l'hiver. Le lac de Livigno gelé en hiver, alimentant le barrage, est traversé à ski de fond par les habitants comme voie de raccourci."},
+{id:1131,name:"Bormio",             region:"Italie", massif:"Stelvio", alt:3012, lat:46.47, lon:10.37,
+ open:"Nov", created:1945, domain:"50 km de pistes + glacier", anecdote:"Ville thermale depuis l'époque romaine — les thermes de Bormio (QC Terme) ont été fréquentés par Léonard de Vinci qui en a fait des croquis. Piste de descente olympique de Calgary 1985 — la Stelvio, 3,3 km à 63% de pente max, est considérée comme la piste la plus exigeante du circuit de Coupe du Monde. Vue sur le glacier de l'Ortler (3905m)."},
+{id:1132,name:"Madonna di Campiglio",region:"Italie", massif:"Trentino", alt:2600, lat:46.22, lon:10.83,
+ open:"Déc", created:1926, domain:"150 km de pistes", anecdote:"La station la plus élégante du Trentin — l'impératrice Sissi d'Autriche y séjournait dès 1885, le tsar Nicolas II de Russie y est venu en 1894. La 3Tre, piste de slalom de Coupe du Monde, est parmi les plus techniques du circuit mondial. Les Dolomites de Brenta, massif calcaire unique au monde par sa formation géologique, encadrent chaque piste."},
+{id:1133,name:"Ortisei",            region:"Italie", massif:"Dolomites Val Gardena", alt:2518, lat:46.58, lon:11.67,
+ open:"Déc", created:1935, domain:"175 km + Sella Ronda", anecdote:"Chef-lieu de la Communauté ladin de Val Gardena — langue romane préservée depuis l'Empire romain. Les sculpteurs sur bois d'Ortisei exportent leurs créations dans le monde entier depuis le 17ème siècle — 3000 sculpteurs actifs pour 5000 habitants. La Rasciesa (2563m) offre un panorama à 360° sur les Dolomites reconnu comme l'un des plus beaux d'Europe."},
+// ── ESPAGNE ───────────────────────────────────────────
+{id:1140,name:"Sierra Nevada",      region:"Espagne", massif:"Sierra Nevada", alt:3300, lat:37.09, lon:-3.40,
+ open:"Déc", created:1964, domain:"130 km de pistes", anecdote:"La station la plus méridionale d'Europe continentale à 35 km de Grenade — on peut skier sous un soleil de 20°C. Le Mulhacén (3479m), point culminant de la péninsule ibérique, domine la station. Vue sur le détroit de Gibraltar et le Maroc par temps clair depuis les pistes à 3000m. L'Alhambra de Grenade est visible de la station."},
+{id:1141,name:"Baqueira-Beret",     region:"Espagne", massif:"Val d'Aran", alt:2510, lat:42.70, lon:0.94,
+ open:"Nov", created:1964, domain:"167 km de pistes", anecdote:"La station préférée de la famille royale espagnole depuis Juan Carlos I. Le Val d'Aran est une enclave géographique unique — vallée occitane enclavée dans les Pyrénées espagnoles où l'on parle aranais, dialecte gascon, langue officielle de Catalogne. La neige de Baqueira, côté atlantique des Pyrénées, est réputée abondante et régulière."},
+{id:1142,name:"Candanchú",          region:"Espagne", massif:"Pyrénées aragonaises", alt:2400, lat:42.79, lon:-0.52,
+ open:"Déc", created:1928, domain:"50 km de pistes", anecdote:"La plus ancienne station d'Espagne, fondée par des officiers de l'armée espagnole en 1928. Candanchú est au col du Somport — frontière franco-espagnole depuis l'Antiquité, passage du chemin de Saint-Jacques-de-Compostelle emprunté par des millions de pèlerins. Les contrebandiers franchissaient ce col de nuit pendant la dictature franquiste."},
+// ── FRANCE MASSIF CENTRAL ─────────────────────────────
+{id:1150,name:"Le Lioran",          region:"Massif Central", massif:"Cantal", alt:1855, lat:45.12, lon:2.76,
+ open:"Déc", created:1935, domain:"60 km de pistes", anecdote:"Dans le Cantal, plus grand volcan d'Europe avec 2700 km² de superficie. Le Plomb du Cantal (1855m) est accessible par le plus vieux téléphérique des Alpes encore en service. La fourme de Cantal, fromage AOP fabriqué depuis le 4ème siècle, est affiné dans les burons (cabanes de bergers) d'altitude visibles depuis les pistes."},
+{id:1151,name:"Super-Besse",        region:"Massif Central", massif:"Auvergne", alt:1850, lat:45.49, lon:2.84,
+ open:"Déc", created:1960, domain:"43 km de pistes", anecdote:"Sur le flanc du Puy de Sancy (1886m), point culminant du Massif Central et plus ancien volcan d'Europe (10 millions d'années). Le lac Pavin voisin, maare volcanique de 92m de profondeur, est l'un des lacs les plus purs de France. La tomme fraîche pour l'aligot auvergnat est produite dans les fermes du plateau autour de la station."},
+// ── AMÉRIQUE DU NORD ──────────────────────────────────
+{id:1160,name:"Mont-Sainte-Anne",   region:"Canada", massif:"Laurentides", alt:800, lat:47.08, lon:-70.91,
+ open:"Nov", created:1966, domain:"71 km de pistes", anecdote:"À 40km de Québec City, sur les rives du Saint-Laurent. Mont-Sainte-Anne a accueilli les Championnats du Monde de VTT et accueille chaque année une Coupe du Monde de biathlon. La basilique Sainte-Anne-de-Beaupré (1658), grand lieu de pèlerinage catholique du Québec, est visible depuis certaines pistes. Températures jusqu'à -30°C en janvier."},
+{id:1161,name:"Marble Mountain",    region:"Canada", massif:"Terre-Neuve", alt:645, lat:48.99, lon:-57.93,
+ open:"Nov", created:1961, domain:"40 km de pistes", anecdote:"La seule grande station de Terre-Neuve, île atlantique au bout du Canada. Marble Mountain reçoit jusqu'à 5m de neige par an grâce aux perturbations atlantiques qui s'engouffrent dans le golfe du Saint-Laurent. La côte de Terre-Neuve était fréquentée par les baleiniers basques dès le 16ème siècle — leur présence est documentée par les archives espagnoles."},
+{id:1162,name:"Snowshoe Mountain",  region:"États-Unis", massif:"West Virginia Appalachians", alt:1491, lat:38.40, lon:-79.99,
+ open:"Nov", created:1974, domain:"250 ha de pistes", anecdote:"La plus grande station des Appalaches du Sud, à seulement 4h de Washington DC et Charlotte. Snowshoe est perchée sur le Cheat Mountain, à 1400m dans les montagnes de Virginie-Occidentale — état créé pendant la Guerre de Sécession en 1863 par les comtés de Virginie refusant de faire sécession de l'Union. Neige abondante grâce à l'effet orographique des Appalaches."},
+{id:1163,name:"Sugarloaf",          region:"États-Unis", massif:"Maine Appalachians", alt:1291, lat:45.03, lon:-70.32,
+ open:"Nov", created:1951, domain:"600 ha de pistes", anecdote:"La station la plus sauvage de la côte Est — entourée de 3 millions d'acres de forêt vierge du Maine sans une seule route ni habitation à l'horizon. Les orignaux (élans nord-américains) traversent régulièrement les pistes. La rivière Carrabassett gèle en contrebas. Les températures atteignent -40°C en janvier — Sugarloaf est la station la plus froide de la côte Est."},
+{id:1164,name:"Jay Peak",           region:"États-Unis", massif:"Vermont Green Mountains", alt:1178, lat:44.93, lon:-72.52,
+ open:"Oct", created:1955, domain:"385 ha de pistes", anecdote:"La station américaine qui reçoit le plus de neige — jusqu'à 10m par an grâce à l'effet de lac du lac Champlain et aux perturbations canadiennes. À 8km de la frontière québécoise — 40% de la clientèle est canadienne. Le patois franco-québécois des habitants de Jay, descendants des colons français du 18ème siècle, est encore parlé dans les commerces locaux."},
+// ── ASIE ──────────────────────────────────────────────
+{id:1170,name:"Myoko Suginohara",   region:"Japon", massif:"Niigata", alt:1280, lat:36.99, lon:138.10,
+ open:"Déc", created:1958, domain:"20 km de pistes", anecdote:"Dans la préfecture de Niigata, le 'pays de la neige' du Japon — jusqu'à 20m de précipitations neigeuses par an grâce à l'humidité de la mer du Japon. La région de Myoko est le paradis caché des locaux qui veulent éviter les foules de Niseko. Les terrasses de rizières en escalier, recouvertes de neige en hiver, créent des paysages de gravures japonaises."},
+{id:1171,name:"Nozawa Onsen (ski)", region:"Japon", massif:"Nagano", alt:1650, lat:36.92, lon:138.44,
+ open:"Déc", created:1924, domain:"35 km de pistes", anecdote:"Village thermal traditionnel fondé en 712 après J-C. Les 13 bains publics gratuits du village (ojiya) sont alimentés par des sources à 90°C — les villageois y lavent encore leur linge. Le festival Dosojin Fire Festival (UNESCO) en janvier met le feu à une tour de 15m construite par les habitants — les hommes de 25 et 42 ans doivent défendre la tour des attaquants avec des torches."},
+{id:1172,name:"Hakuba Goryu",       region:"Japon", massif:"Nagano", alt:1680, lat:36.70, lon:137.86,
+ open:"Nov", created:1970, domain:"40 km de pistes", anecdote:"L'une des 11 stations de la vallée de Hakuba — site des JO de Nagano 1998. Le Goryu offre les meilleures pistes intermédiaires de la région. Vue sur la chaîne des Alpes japonaises du nord (Kita-Alps) depuis le sommet — une barrière montagneuse de 3000m qui capte toute la neige sibérienne venant de la mer du Japon. Les macaques japonais voisins se baignent dans les sources chaudes."},
+{id:1173,name:"Naeba",              region:"Japon", massif:"Niigata", alt:1789, lat:36.93, lon:138.64,
+ open:"Déc", created:1962, domain:"48 km de pistes", anecdote:"Station japonaise mythique de la génération Bubble Economy des années 80 — les salarymen tokyoïtes prenaient le Shinkansen pour y passer le week-end, transformant la station en vitrine du miracle économique japonais. Le Fuji Rock Festival, le plus grand festival de musique du Japon, s'y tient chaque été depuis 1997 sur les pentes encore enneigées en juillet."},
+{id:1174,name:"Nozawa Onsen (village)",region:"Japon", massif:"Nagano", alt:1650, lat:36.91, lon:138.44,
+ open:"Déc", created:1912, domain:"35 km de pistes", anecdote:"Village de montagne parmi les plus anciens du Japon — l'onsen (source thermale) principale date de l'époque Heian (794-1185). Les auberges ryokan centenaires accueillent les skieurs dans des chambres en tatami avec bains privés alimentés par les sources volcaniques. La neige du côté nord des Alpes japonaises y est particulièrement légère et froide."},
+{id:1175,name:"Hirafu (Niseko Village)",region:"Japon", massif:"Hokkaido", alt:1308, lat:42.87, lon:140.70,
+ open:"Nov", created:1972, domain:"48 km (Niseko United)", anecdote:"Village principal du domaine Niseko United — 4 stations reliées sur le flanc du volcan Yōtei. Les Australiens ont 'découvert' Niseko dans les années 2000 et en ont fait la destination poudreuse n°1 du monde. Aujourd'hui 70% des visiteurs sont étrangers — restaurants australiens, bars irlandais et boutiques françaises à côté des izakayas japonais traditionnels."},
+// ── EUROPE BALKANS ────────────────────────────────────
+{id:1180,name:"Borovets",           region:"Bulgarie", massif:"Rila", alt:2560, lat:42.27, lon:23.61,
+ open:"Déc", created:1896, domain:"40 km de pistes", anecdote:"La plus ancienne station de ski des Balkans, fondée en 1896 comme résidence de chasse du tsar Ferdinand Ier de Bulgarie. Le palais royal de Tsarska Bistritsa, entouré de forêts de pins centenaires, est au cœur de la station. Le parc national Rila, abritant les 7 Lacs de Rila aux eaux d'un bleu irréel, entoure le domaine skiable."},
+{id:1181,name:"Pamporovo",          region:"Bulgarie", massif:"Rhodopes", alt:1926, lat:41.65, lon:24.69,
+ open:"Déc", created:1936, domain:"25 km de pistes", anecdote:"Dans les Rhodopes, montagnes mythiques de la Thrace antique — patrie légendaire d'Orphée, le musicien qui descendit aux Enfers pour ramener Eurydice. Les villages pomaks (musulmans bulgares) des alentours ont conservé des traditions médiévales uniques. Station la plus ensoleillée de Bulgarie grâce à l'exposition sud des Rhodopes."},
+{id:1182,name:"Bjelašnica",         region:"Bosnie", massif:"Dinarides", alt:2067, lat:43.72, lon:18.27,
+ open:"Déc", created:1984, domain:"20 km de pistes", anecdote:"Station construite pour les JO d'Hiver de Sarajevo 1984 — les derniers JO de Yougoslavie avant la guerre. Pendant le siège de Sarajevo (1992-1995), la station était sur la ligne de front — des combats s'y sont déroulés. Aujourd'hui restaurée, Bjelašnica est le symbole de la renaissance bosnienne et attire les randonneurs et skieurs du monde entier."},
+{id:1183,name:"Jahorina",           region:"Bosnie", massif:"Dinarides", alt:1916, lat:43.72, lon:18.57,
+ open:"Déc", created:1984, domain:"20 km de pistes", anecdote:"Co-hôte des JO de Sarajevo 1984 avec Bjelašnica pour les épreuves féminines de ski alpin. Aussi dévastée par la guerre de Bosnie et aussi ressuscitée depuis. La montagne Jahorina, visible de Sarajevo, était un des points d'observation des forces serbes pendant le siège. La réconciliation entre communautés se construit aussi sur les pistes."},
+// ── AMÉRIQUE LATINE ───────────────────────────────────
+{id:1190,name:"El Bolsón (Perito Moreno)",region:"Argentine", massif:"Patagonie andine", alt:2255, lat:-41.97, lon:-71.53,
+ open:"Juil", created:1980, domain:"15 km de pistes", anecdote:"Petite station patagonne dans la vallée d'El Bolsón, connue comme la 'capitale de la bière artisanale' argentine. La forêt de coihues (hêtres patagoniens) aux troncs blancs encadre les pistes. Le condor des Andes plane en permanence au-dessus du domaine — avec son envergure de 3,3m, il est l'oiseau volant le plus grand du monde."},
+{id:1191,name:"Caviahue",           region:"Argentine", massif:"Neuquén", alt:2280, lat:-37.87, lon:-71.03,
+ open:"Juil", created:1971, domain:"20 km de pistes", anecdote:"Station nichée dans un cirque volcanique au pied du Copahue — volcan actif dont les éruptions en 2012 et 2016 ont nécessité l'évacuation partielle de la station. La lagune volcanique de Copahue, aux eaux jaune soufre, est visible depuis les pistes. Les geysers et sources hydrothermales actives créent des brumes vaporeuses uniques en montagne."},
+// ── EUROPE NORDIQUE ───────────────────────────────────
+{id:1200,name:"Saariselkä",         region:"Finlande", massif:"Laponie", alt:531, lat:68.42, lon:27.42,
+ open:"Nov", created:1971, domain:"18 km de pistes", anecdote:"Au-delà du Cercle Polaire Arctique — à 68° de latitude nord. La nuit polaire dure ici 52 jours consécutifs sans voir le soleil. Les aurores boréales sont visibles presque chaque nuit de septembre à mars. Le parc national d'Urho Kekkonen, immense wilderness finlandais de 2550 km², s'étend à l'est — les gloutons et les loups arctiques y vivent."},
+{id:1201,name:"Ylläs",              region:"Finlande", massif:"Laponie", alt:718, lat:67.56, lon:24.25,
+ open:"Oct", created:1968, domain:"63 km de pistes", anecdote:"La station la plus grande de Finlande avec 63 km de pistes — et pourtant le sommet ne culmine qu'à 718m. La topographie lapone compense par une neige exceptionnellement abondante et des températures garantissant une neige sèche de novembre à mai. Ylläs a la plus longue piste de ski de Finlande : 3,5 km de descente continue dans la forêt de bouleaux arctiques."},
+{id:1202,name:"Riksgränsen",        region:"Suède", massif:"Laponie suédoise", alt:909, lat:68.43, lon:18.13,
+ open:"Fév", created:1902, domain:"30 km de pistes", anecdote:"La station la plus nordique du monde à 68° Nord, à la frontière norvégienne. En mai et juin, la saison se termine en ski sous le soleil de minuit — le soleil ne se couche pas pendant 6 semaines. Riksgränsen est accessible uniquement par le train des Minerais qui traverse la Laponie suédoise depuis 1902, reliant les mines de fer de Kiruna à la côte norvégienne."},
+// ── ASIE CENTRALE ─────────────────────────────────────
+{id:1210,name:"Malam Jabba",        region:"Pakistan", massif:"Hindu Kush", alt:2804, lat:34.81, lon:72.56,
+ open:"Jan", created:1989, domain:"10 km de pistes", anecdote:"La seule station de ski du Pakistan, dans le Swat — 'la Suisse de l'Orient' selon Churchill. Détruite par les talibans en 2008, reconstruite en 2018 avec l'aide du gouvernement KPK. Skier ici c'est skier au cœur du Grand Jeu — le jeu d'espionnage entre Empire britannique et Empire russe du 19ème siècle qui a inspiré Kipling. Le bouddhisme ancien du Gandhara a laissé des traces sculptées dans les falaises voisines."},
+{id:1211,name:"Tochal",             region:"Iran", massif:"Alborz", alt:3964, lat:35.84, lon:51.42,
+ open:"Déc", created:1976, domain:"25 km de pistes", anecdote:"La station la plus haute d'Iran, accessible par le plus long téléphérique du monde (8 km) depuis les hauteurs nord de Téhéran. Tochal (3964m) domine les 15 millions d'habitants de la capitale iranienne — par temps clair, on aperçoit le Damavand (5671m), plus haut volcan d'Asie. Construite sous le Shah en 1976, la station a survécu à la révolution islamique de 1979."},
+// ── AMÉRIQUE CENTRALE ─────────────────────────────────
+{id:1220,name:"Cerro Catedral",     region:"Argentine", massif:"Patagonie andine", alt:2388, lat:-41.17, lon:-71.43,
+ open:"Juil", created:1934, domain:"120 km de pistes", anecdote:"La plus grande station d'Amérique du Sud reliée à Bariloche. La Catedral doit son nom à ses aiguilles rocheuses en forme de cathédrale gothique. Fondée en 1934 par le Club Andino Bariloche — la plus ancienne association d'alpinisme d'Amérique du Sud. Les pumas de Patagonie descendent parfois jusqu'aux forêts de lenga (hêtre patagonien) qui bordent les pistes."},
+{id:1221,name:"Chapelco",           region:"Argentine", massif:"Neuquén", alt:1980, lat:-40.26, lon:-71.22,
+ open:"Juil", created:1970, domain:"30 km de pistes", anecdote:"Près de San Martín de los Andes, dans la région des Lacs patagoniens. Les couleurs automnales des forêts de lengas et ñires (arbres patagoniens endémiques) créent des paysages de feu en mai avant les premières neiges. La région était le territoire des Mapuches — peuple indigène dont la résistance à la colonisation espagnole dura 300 ans et n'a jamais été totalement vaincue."},
 ];
 
 // ════════════════════════════════════════════════════════
@@ -865,6 +1206,37 @@ const REGION_BOUNDS={
   'Maroc':        [[30.8,-8.2],[31.6,-7.4]],
   'Iran':         [[35.7,51.0],[36.5,52.0]],
   'Kazakhstan':   [[42.8,76.5],[43.5,77.5]],
+  'Canada':       [[46.0,-123.0],[52.0,-74.0]],
+  'Finlande':     [[66.0,24.0],[68.5,30.0]],
+  'Islande':      [[63.8,-22.0],[64.3,-21.2]],
+  'Écosse':       [[56.5,-5.2],[57.3,-3.3]],
+  'Slovénie':     [[46.2,13.5],[46.7,14.2]],
+  'Roumanie':     [[45.4,25.3],[46.0,26.0]],
+  'Bulgarie':     [[41.6,23.2],[42.1,23.9]],
+  'Serbie':       [[43.0,20.5],[43.6,21.2]],
+  'Grèce':        [[38.3,22.2],[38.9,23.0]],
+  'Liban':        [[33.7,35.4],[34.3,36.2]],
+  'Turquie':      [[39.6,29.0],[40.4,41.5]],
+  'Inde':         [[33.8,74.1],[34.3,74.7]],
+  'Chine':        [[40.7,115.0],[45.2,128.7]],
+  'Corée du Sud': [[37.4,128.4],[38.0,129.0]],
+  'Australie':    [[-36.7,148.1],[-36.3,148.6]],
+  'Afrique du Sud':[[-31.1,27.7],[-30.4,28.3]],
+  'Mexique':      [[25.3,-100.7],[25.9,-100.1]],
+  'Brésil':       [[-29.5,-50.8],[-28.9,-50.3]],
+  'Émirats Arabes Unis':[[24.9,55.0],[25.4,55.5]],
+  'Russie':       [[43.5,40.0],[44.0,40.6]],
+  'Ukraine':      [[48.1,24.1],[48.6,24.8]],
+  'Pologne':      [[49.1,19.7],[49.5,20.3]],
+  'Slovaquie':    [[48.7,19.3],[49.2,20.0]],
+  'Tchéquie':     [[50.5,15.3],[51.0,15.9]],
+  'Hongrie':      [[47.6,19.7],[48.1,20.3]],
+  'Portugal':     [[40.1,-7.9],[40.6,-7.3]],
+  'Luxembourg':   [[49.4,5.7],[49.8,6.2]],
+  'Bosnie':       [[43.5,18.0],[44.0,18.8]],
+  'Ouzbékistan':  [[41.3,69.8],[42.0,70.4]],
+  'Kirghizstan':  [[42.5,74.4],[43.1,75.1]],
+  'Pakistan':     [[34.5,72.2],[35.2,73.0]],
 };
 
 // ════════════ SUPABASE ════════════
@@ -1284,25 +1656,79 @@ function initFilters(){
 }
 
 // ════════════ ACHIEVEMENTS ════════════
+const CONTINENT_MAP = {
+  'Alpes du Nord':'Europe','Alpes du Sud':'Europe','Pyrénées':'Europe',
+  'Suisse':'Europe','Autriche':'Europe','Italie':'Europe',
+  'Massif Central':'Europe','Vosges':'Europe','Jura':'Europe',
+  'Espagne':'Europe','Andorre':'Europe','Norvège':'Europe',
+  'Suède':'Europe','Finlande':'Europe','Islande':'Europe',
+  'Écosse':'Europe','Slovénie':'Europe','Roumanie':'Europe',
+  'Bulgarie':'Europe','Serbie':'Europe','Grèce':'Europe',
+  'Pologne':'Europe','Slovaquie':'Europe','Tchéquie':'Europe',
+  'Hongrie':'Europe','Portugal':'Europe','Luxembourg':'Europe',
+  'Ukraine':'Europe','Russie':'Europe','Géorgie':'Europe',
+  'Maroc':'Afrique','Afrique du Sud':'Afrique',
+  'Liban':'Asie','Turquie':'Asie','Iran':'Asie','Kazakhstan':'Asie',
+  'Inde':'Asie','Chine':'Asie','Corée du Sud':'Asie','Japon':'Asie',
+  'Bosnie':'Europe','Ouzbékistan':'Asie','Kirghizstan':'Asie','Pakistan':'Asie',
+  'États-Unis':'Amérique du Nord','Canada':'Amérique du Nord','Mexique':'Amérique du Nord',
+  'Chili':'Amérique du Sud','Argentine':'Amérique du Sud','Brésil':'Amérique du Sud',
+  'Australie':'Océanie','Nouvelle-Zélande':'Océanie',
+};
+
+function getContinents(ids) {
+  const set = new Set();
+  ids.forEach(id => {
+    const s = STATIONS.find(s=>s.id===id);
+    if(s) { const c = CONTINENT_MAP[s.region]; if(c) set.add(c); }
+  });
+  return set;
+}
+
 const ACHIEVEMENTS = [
-  {n:1,   icon:'🎿', name:'Premier départ',    desc:'Ta première station !'},
-  {n:5,   icon:'⛷️', name:'En jambes',         desc:'5 stations visitées'},
-  {n:10,  icon:'🏔️', name:'Montagnard',        desc:'10 stations visitées'},
-  {n:20,  icon:'❄️', name:'Chasseur de neige', desc:'20 stations visitées'},
-  {n:30,  icon:'🦅', name:'Aigle des cimes',   desc:'30 stations visitées'},
-  {n:50,  icon:'🔥', name:'Piste rouge',       desc:'50 stations visitées'},
-  {n:75,  icon:'💎', name:'Diamant noir',      desc:'75 stations visitées'},
-  {n:100, icon:'🏆', name:'Légende des pistes',desc:'100 stations visitées'},
-  {n:150, icon:'🌍', name:'Globe-trotter',     desc:'150 stations visitées'},
-  {n:193, icon:'👑', name:'PeakDone',          desc:'Toutes les stations !'},
+  // Quantitatifs
+  {id:'s1',   type:'count', n:1,   icon:'🎿', name:'Premier départ',      desc:'1ère station visitée'},
+  {id:'s5',   type:'count', n:5,   icon:'⛷️', name:'En jambes',            desc:'5 stations visitées'},
+  {id:'s10',  type:'count', n:10,  icon:'🏔️', name:'Montagnard',           desc:'10 stations visitées'},
+  {id:'s20',  type:'count', n:20,  icon:'❄️', name:'Chasseur de poudreuse',desc:'20 stations visitées'},
+  {id:'s30',  type:'count', n:30,  icon:'🦅', name:'Aigle des cimes',      desc:'30 stations visitées'},
+  {id:'s50',  type:'count', n:50,  icon:'🌊', name:'Avalanche',            desc:'50 stations visitées'},
+  {id:'s75',  type:'count', n:75,  icon:'🧭', name:'Grand Alpiniste',      desc:'75 stations visitées'},
+  {id:'s100', type:'count', n:100, icon:'🏆', name:'Centurion des neiges', desc:'100 stations visitées'},
+  {id:'s150', type:'count', n:150, icon:'🌍', name:'Globe-skieur',         desc:'150 stations visitées'},
+  {id:'s200', type:'count', n:200, icon:'👑', name:'Légende des pistes',   desc:'200 stations visitées'},
+  // Continents
+  {id:'c2', type:'continents', n:2, icon:'✈️',  name:'Ski sans frontières', desc:'Skier sur 2 continents'},
+  {id:'c3', type:'continents', n:3, icon:'🗺️',  name:'Explorateur',         desc:'Skier sur 3 continents'},
+  {id:'c4', type:'continents', n:4, icon:'🌐',  name:'Citoyen du monde',    desc:'Skier sur 4 continents'},
+  {id:'c5', type:'continents', n:5, icon:'🚀',  name:'Astronaute des neiges',desc:'Skier sur 5 continents'},
+  {id:'c6', type:'continents', n:6, icon:'🌏',  name:'Tous les continents', desc:'Skier sur 6 continents'},
+  // Régionaux
+  {id:'japan', type:'region', region:'Japon', icon:'🗾', name:'Japow',          desc:'Visiter une station au Japon'},
+  {id:'usa',   type:'region', region:'États-Unis', icon:'🦅', name:'All-American',desc:'Visiter une station aux USA'},
+  {id:'andes', type:'custom', check:(ids)=>STATIONS.filter(s=>ids.has(s.id)&&(s.region==='Chili'||s.region==='Argentine')).length>=1,
+   icon:'🏔️', name:'Andiniste',   desc:'Skier dans les Andes'},
+  {id:'arctic',type:'custom', check:(ids)=>STATIONS.filter(s=>ids.has(s.id)&&(s.region==='Finlande'||s.region==='Norvège'||s.region==='Islande')).length>=1,
+   icon:'🌌', name:'Polaire',     desc:'Skier dans le Grand Nord'},
+  {id:'sahara',type:'custom', check:(ids)=>STATIONS.filter(s=>ids.has(s.id)&&(s.region==='Maroc'||s.region==='Liban'||s.region==='Iran')).length>=1,
+   icon:'🐪', name:'Ski du désert',desc:'Skier proche du désert'},
 ];
+
+function checkAchievement(a, ids) {
+  const conts = getContinents(ids);
+  if (a.type==='count')      return ids.size >= a.n;
+  if (a.type==='continents') return conts.size >= a.n;
+  if (a.type==='region')     return STATIONS.some(s=>ids.has(s.id)&&s.region===a.region);
+  if (a.type==='custom')     return a.check(ids);
+  return false;
+}
 
 function renderAchievements(count) {
   const row = document.getElementById('achievements-row');
   if (!row) return;
   row.innerHTML = '';
   ACHIEVEMENTS.forEach(a => {
-    const unlocked = count >= a.n;
+    const unlocked = checkAchievement(a, visitedIds);
     const div = document.createElement('div');
     div.className = 'achievement' + (unlocked ? ' unlocked' : '');
     div.innerHTML = `<div class="ach-icon">${a.icon}</div>
