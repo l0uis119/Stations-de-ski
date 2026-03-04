@@ -313,7 +313,9 @@ mark{background:rgba(91,163,208,.22);color:var(--accent2);border-radius:2px;}
 @media(min-width:1024px){
   #page-map{display:grid;grid-template-columns:1fr 360px;height:100%;}
   #leaflet-map{grid-column:1;grid-row:1;height:100%;}
-  .station-sheet{position:relative;right:0!important;width:360px;height:100%;grid-column:2;grid-row:1;display:flex!important;border-left:1px solid var(--border);}
+  .station-sheet{position:relative;right:0!important;width:360px;height:100%;grid-column:2;grid-row:1;border-left:1px solid var(--border);display:none;}
+  .station-sheet.open{display:flex;}
+  #page-map:not(:has(.station-sheet.open)){grid-template-columns:1fr;}
   .layer-controls,.map-controls{z-index:600;}
 }
 </style>
